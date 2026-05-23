@@ -9,7 +9,15 @@ const state = {
   startX: 0,
   startY: 0,
   hasMoved: false,
-  suppressClick: false
+  suppressClick: false,
+  activePointers: new Map(),
+  gestureMode: "idle",
+  pinchStartDistance: 0,
+  pinchStartScale: 1,
+  pinchStartCenterX: 0,
+  pinchStartCenterY: 0,
+  pinchStartTranslateX: 0,
+  pinchStartTranslateY: 0
 };
 
 const viewport = document.querySelector("#treeViewport");
@@ -223,6 +231,9 @@ function bindControls() {
   viewport.addEventListener("pointermove", onPointerMove);
   viewport.addEventListener("pointerup", onPointerUp);
   viewport.addEventListener("pointercancel", onPointerUp);
+  viewport.addEventListener("gesturestart", preventNativeGesture);
+  viewport.addEventListener("gesturechange", preventNativeGesture);
+  viewport.addEventListener("gestureend", preventNativeGesture);
 }
 
 function onWheel(event) {
@@ -239,33 +250,48 @@ function onWheel(event) {
   applyTransform();
 }
 
+function preventNativeGesture(event) {
+  event.preventDefault();
+}
+
 function onPointerDown(event) {
   event.preventDefault();
+  state.activePointers.set(event.pointerId, getPointerPoint(event));
   state.dragging = true;
   state.hasMoved = false;
-  state.dragStartX = event.clientX;
-  state.dragStartY = event.clientY;
-  state.startX = state.translateX;
-  state.startY = state.translateY;
   viewport.classList.add("is-dragging");
-  viewport.setPointerCapture(event.pointerId);
+
+  if (viewport.setPointerCapture) {
+    viewport.setPointerCapture(event.pointerId);
+  }
+
+  if (state.activePointers.size >= 2) {
+    startPinchGesture();
+    return;
+  }
+
+  startPanGesture(event);
 }
 
 function onPointerMove(event) {
-  if (!state.dragging) {
+  if (!state.activePointers.has(event.pointerId)) {
     return;
   }
 
   event.preventDefault();
-  const movedX = event.clientX - state.dragStartX;
-  const movedY = event.clientY - state.dragStartY;
-  state.hasMoved = state.hasMoved || Math.hypot(movedX, movedY) > 6;
-  state.translateX = state.startX + event.clientX - state.dragStartX;
-  state.translateY = state.startY + event.clientY - state.dragStartY;
-  applyTransform();
+  state.activePointers.set(event.pointerId, getPointerPoint(event));
+
+  if (state.activePointers.size >= 2) {
+    updatePinchGesture();
+    return;
+  }
+
+  updatePanGesture(event);
 }
 
 function onPointerUp(event) {
+  state.activePointers.delete(event.pointerId);
+
   if (state.hasMoved) {
     state.suppressClick = true;
     window.setTimeout(() => {
@@ -273,12 +299,108 @@ function onPointerUp(event) {
     }, 250);
   }
 
-  state.dragging = false;
-  viewport.classList.remove("is-dragging");
-
   if (viewport.hasPointerCapture(event.pointerId)) {
     viewport.releasePointerCapture(event.pointerId);
   }
+
+  if (state.activePointers.size === 1) {
+    const remainingPoint = [...state.activePointers.values()][0];
+    state.gestureMode = "pan";
+    state.dragStartX = remainingPoint.x;
+    state.dragStartY = remainingPoint.y;
+    state.startX = state.translateX;
+    state.startY = state.translateY;
+    return;
+  }
+
+  state.dragging = false;
+  state.gestureMode = "idle";
+  viewport.classList.remove("is-dragging");
+}
+
+function startPanGesture(event) {
+  const point = getPointerPoint(event);
+
+  state.gestureMode = "pan";
+  state.dragStartX = point.x;
+  state.dragStartY = point.y;
+  state.startX = state.translateX;
+  state.startY = state.translateY;
+}
+
+function updatePanGesture(event) {
+  if (state.gestureMode !== "pan") {
+    return;
+  }
+
+  const point = getPointerPoint(event);
+  const movedX = point.x - state.dragStartX;
+  const movedY = point.y - state.dragStartY;
+  state.hasMoved = state.hasMoved || Math.hypot(movedX, movedY) > 6;
+  state.translateX = state.startX + movedX;
+  state.translateY = state.startY + movedY;
+  applyTransform();
+}
+
+function startPinchGesture() {
+  const [firstPoint, secondPoint] = getPrimaryGesturePoints();
+  const center = getGestureCenter(firstPoint, secondPoint);
+
+  state.gestureMode = "pinch";
+  state.hasMoved = true;
+  state.pinchStartDistance = getGestureDistance(firstPoint, secondPoint);
+  state.pinchStartScale = state.scale;
+  state.pinchStartCenterX = center.x;
+  state.pinchStartCenterY = center.y;
+  state.pinchStartTranslateX = state.translateX;
+  state.pinchStartTranslateY = state.translateY;
+}
+
+function updatePinchGesture() {
+  if (state.gestureMode !== "pinch") {
+    startPinchGesture();
+  }
+
+  const [firstPoint, secondPoint] = getPrimaryGesturePoints();
+  const center = getGestureCenter(firstPoint, secondPoint);
+  const distance = getGestureDistance(firstPoint, secondPoint);
+
+  if (!state.pinchStartDistance || !distance) {
+    return;
+  }
+
+  const nextScale = clamp(state.pinchStartScale * (distance / state.pinchStartDistance), 0.35, 2.2);
+  const scaleRatio = nextScale / state.pinchStartScale;
+
+  state.hasMoved = true;
+  state.scale = nextScale;
+  state.translateX = center.x - (state.pinchStartCenterX - state.pinchStartTranslateX) * scaleRatio;
+  state.translateY = center.y - (state.pinchStartCenterY - state.pinchStartTranslateY) * scaleRatio;
+  applyTransform();
+}
+
+function getPointerPoint(event) {
+  const rect = viewport.getBoundingClientRect();
+
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top
+  };
+}
+
+function getPrimaryGesturePoints() {
+  return [...state.activePointers.values()].slice(0, 2);
+}
+
+function getGestureCenter(firstPoint, secondPoint) {
+  return {
+    x: (firstPoint.x + secondPoint.x) / 2,
+    y: (firstPoint.y + secondPoint.y) / 2
+  };
+}
+
+function getGestureDistance(firstPoint, secondPoint) {
+  return Math.hypot(firstPoint.x - secondPoint.x, firstPoint.y - secondPoint.y);
 }
 
 function zoomBy(amount) {
