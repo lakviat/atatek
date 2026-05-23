@@ -1,0 +1,76 @@
+{
+  "people": [
+    {
+      "id": "root-ancestor",
+      "name": "Root Ancestor",
+      "generation": 0,
+      "parents": [],
+      "photo": "",
+      "years": "Dates to be added",
+      "note": "This is the starting ancestor for the visible tree."
+    },
+    {
+      "id": "second-generation-a",
+      "name": "Second Generation A",
+      "generation": 1,
+      "parents": ["root-ancestor"],
+      "photo": "",
+      "years": "",
+      "note": "Replace this placeholder with a real family member."
+    },
+    {
+      "id": "second-generation-b",
+      "name": "Second Generation B",
+      "generation": 1,
+      "parents": ["root-ancestor"],
+      "photo": "",
+      "years": "",
+      "note": "Replace this placeholder with a real family member."
+    },
+    {
+      "id": "third-generation-a",
+      "name": "Third Generation A",
+      "generation": 2,
+      "parents": ["second-generation-a"],
+      "photo": "",
+      "years": "",
+      "note": "Add names, photos, and details as they become available."
+    },
+    {
+      "id": "third-generation-b",
+      "name": "Third Generation B",
+      "generation": 2,
+      "parents": ["second-generation-a"],
+      "photo": "",
+      "years": "",
+      "note": "Add names, photos, and details as they become available."
+    },
+    {
+      "id": "third-generation-c",
+      "name": "Third Generation C",
+      "generation": 2,
+      "parents": ["second-generation-b"],
+      "photo": "",
+      "years": "",
+      "note": "Add names, photos, and details as they become available."
+    },
+    {
+      "id": "fourth-generation-a",
+      "name": "Fourth Generation A",
+      "generation": 3,
+      "parents": ["third-generation-b"],
+      "photo": "",
+      "years": "",
+      "note": "This placeholder shows how later generations will appear."
+    },
+    {
+      "id": "fourth-generation-b",
+      "name": "Fourth Generation B",
+      "generation": 3,
+      "parents": ["third-generation-c"],
+      "photo": "",
+      "years": "",
+      "note": "This placeholder shows how later generations will appear."
+    }
+  ]
+}

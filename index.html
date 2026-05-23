@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Atatek | Junos Shalia Family Tree</title>
+    <meta
+      name="description"
+      content="A simple ancestry tree for the Junos Shalia family line."
+    >
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div>
+        <p class="eyebrow">Junos Shalia family line</p>
+        <h1>Atatek</h1>
+      </div>
+      <div class="tree-controls" aria-label="Tree controls">
+        <button class="icon-button" type="button" data-action="zoom-out" aria-label="Zoom out">
+          -
+        </button>
+        <button class="icon-button" type="button" data-action="reset" aria-label="Reset view">
+          1:1
+        </button>
+        <button class="icon-button" type="button" data-action="zoom-in" aria-label="Zoom in">
+          +
+        </button>
+      </div>
+    </header>
+
+    <main class="tree-shell">
+      <section class="tree-viewport" id="treeViewport" aria-label="Family tree">
+        <div class="tree-canvas" id="treeCanvas">
+          <svg class="tree-lines" id="treeLines" aria-hidden="true"></svg>
+          <div class="tree-nodes" id="treeNodes"></div>
+        </div>
+      </section>
+    </main>
+
+    <dialog class="profile-dialog" id="profileDialog" aria-labelledby="profileName">
+      <button class="close-button" type="button" id="closeProfile" aria-label="Close profile">
+        x
+      </button>
+      <div class="profile-content">
+        <div class="profile-photo" id="profilePhoto"></div>
+        <div class="profile-details">
+          <p class="profile-kicker" id="profileGeneration"></p>
+          <h2 id="profileName"></h2>
+          <p class="profile-years" id="profileYears"></p>
+          <p class="profile-note" id="profileNote"></p>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>

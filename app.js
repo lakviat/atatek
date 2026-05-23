@@ -1,0 +1,223 @@
+const state = {
+  people: [],
+  scale: 0.88,
+  translateX: 80,
+  translateY: 72,
+  dragging: false,
+  dragStartX: 0,
+  dragStartY: 0,
+  startX: 0,
+  startY: 0
+};
+
+const viewport = document.querySelector("#treeViewport");
+const canvas = document.querySelector("#treeCanvas");
+const nodesLayer = document.querySelector("#treeNodes");
+const linesLayer = document.querySelector("#treeLines");
+const dialog = document.querySelector("#profileDialog");
+const closeProfile = document.querySelector("#closeProfile");
+
+init();
+
+async function init() {
+  const response = await fetch("data/people.json");
+  const data = await response.json();
+  state.people = data.people;
+
+  renderTree();
+  bindControls();
+  centerTree();
+}
+
+function renderTree() {
+  const peopleById = new Map(state.people.map((person) => [person.id, person]));
+  const generations = groupByGeneration(state.people);
+
+  const horizontalGap = 230;
+  const verticalGap = 190;
+  const startX = 170;
+  const startY = 120;
+
+  generations.forEach((generation, generationIndex) => {
+    const rowWidth = (generation.length - 1) * horizontalGap;
+    const rowStartX = startX + Math.max(0, (760 - rowWidth) / 2);
+
+    generation.forEach((person, personIndex) => {
+      person.x = rowStartX + personIndex * horizontalGap;
+      person.y = startY + generationIndex * verticalGap;
+    });
+  });
+
+  canvas.style.width = `${Math.max(1200, getMax(state.people, "x") + 220)}px`;
+  canvas.style.height = `${Math.max(780, getMax(state.people, "y") + 190)}px`;
+  linesLayer.setAttribute("viewBox", `0 0 ${canvas.offsetWidth} ${canvas.offsetHeight}`);
+
+  nodesLayer.innerHTML = "";
+  linesLayer.innerHTML = "";
+
+  state.people.forEach((person) => {
+    person.parents.forEach((parentId) => {
+      const parent = peopleById.get(parentId);
+      if (parent) {
+        linesLayer.appendChild(createLine(parent, person));
+      }
+    });
+
+    nodesLayer.appendChild(createPersonButton(person));
+  });
+}
+
+function groupByGeneration(people) {
+  return people
+    .reduce((rows, person) => {
+      rows[person.generation] ||= [];
+      rows[person.generation].push(person);
+      return rows;
+    }, [])
+    .filter(Boolean);
+}
+
+function createLine(parent, child) {
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  const midpointY = parent.y + (child.y - parent.y) / 2;
+
+  path.setAttribute(
+    "d",
+    `M ${parent.x} ${parent.y + 56} C ${parent.x} ${midpointY}, ${child.x} ${midpointY}, ${child.x} ${child.y - 56}`
+  );
+
+  return path;
+}
+
+function createPersonButton(person) {
+  const button = document.createElement("button");
+  button.className = "person-card";
+  button.type = "button";
+  button.style.left = `${person.x}px`;
+  button.style.top = `${person.y}px`;
+  button.setAttribute("aria-label", `Open profile for ${person.name}`);
+  button.innerHTML = `
+    <span class="portrait">${portraitMarkup(person)}</span>
+    <span class="person-name">${person.name}</span>
+    <span class="person-meta">${person.years || `Generation ${person.generation + 1}`}</span>
+  `;
+  button.addEventListener("click", () => openProfile(person));
+  return button;
+}
+
+function portraitMarkup(person) {
+  if (person.photo) {
+    return `<img src="${person.photo}" alt="${person.name}">`;
+  }
+
+  return `<span class="portrait-placeholder" aria-hidden="true">${getInitials(person.name)}</span>`;
+}
+
+function openProfile(person) {
+  document.querySelector("#profilePhoto").innerHTML = portraitMarkup(person);
+  document.querySelector("#profileGeneration").textContent = `Generation ${person.generation + 1}`;
+  document.querySelector("#profileName").textContent = person.name;
+  document.querySelector("#profileYears").textContent = person.years || "Dates to be added";
+  document.querySelector("#profileNote").textContent =
+    person.note || "Profile details and biography can be added here.";
+
+  dialog.showModal();
+}
+
+function bindControls() {
+  document.querySelector("[data-action='zoom-in']").addEventListener("click", () => zoomBy(1.16));
+  document.querySelector("[data-action='zoom-out']").addEventListener("click", () => zoomBy(0.86));
+  document.querySelector("[data-action='reset']").addEventListener("click", centerTree);
+  closeProfile.addEventListener("click", () => dialog.close());
+
+  viewport.addEventListener("wheel", onWheel, { passive: false });
+  viewport.addEventListener("pointerdown", onPointerDown);
+  viewport.addEventListener("pointermove", onPointerMove);
+  viewport.addEventListener("pointerup", onPointerUp);
+  viewport.addEventListener("pointercancel", onPointerUp);
+}
+
+function onWheel(event) {
+  event.preventDefault();
+  const rect = viewport.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+  const nextScale = clamp(state.scale * (event.deltaY > 0 ? 0.92 : 1.08), 0.4, 1.8);
+  const scaleRatio = nextScale / state.scale;
+
+  state.translateX = mouseX - (mouseX - state.translateX) * scaleRatio;
+  state.translateY = mouseY - (mouseY - state.translateY) * scaleRatio;
+  state.scale = nextScale;
+  applyTransform();
+}
+
+function onPointerDown(event) {
+  if (event.target.closest(".person-card")) {
+    return;
+  }
+
+  state.dragging = true;
+  state.dragStartX = event.clientX;
+  state.dragStartY = event.clientY;
+  state.startX = state.translateX;
+  state.startY = state.translateY;
+  viewport.classList.add("is-dragging");
+  viewport.setPointerCapture(event.pointerId);
+}
+
+function onPointerMove(event) {
+  if (!state.dragging) {
+    return;
+  }
+
+  state.translateX = state.startX + event.clientX - state.dragStartX;
+  state.translateY = state.startY + event.clientY - state.dragStartY;
+  applyTransform();
+}
+
+function onPointerUp(event) {
+  state.dragging = false;
+  viewport.classList.remove("is-dragging");
+
+  if (viewport.hasPointerCapture(event.pointerId)) {
+    viewport.releasePointerCapture(event.pointerId);
+  }
+}
+
+function zoomBy(amount) {
+  state.scale = clamp(state.scale * amount, 0.4, 1.8);
+  applyTransform();
+}
+
+function centerTree() {
+  const canvasWidth = canvas.offsetWidth;
+  const canvasHeight = canvas.offsetHeight;
+  const viewportWidth = viewport.clientWidth;
+  const viewportHeight = viewport.clientHeight;
+
+  state.scale = Math.min(0.92, Math.max(0.48, viewportWidth / canvasWidth));
+  state.translateX = (viewportWidth - canvasWidth * state.scale) / 2;
+  state.translateY = Math.max(34, (viewportHeight - canvasHeight * state.scale) / 2);
+  applyTransform();
+}
+
+function applyTransform() {
+  canvas.style.transform = `translate(${state.translateX}px, ${state.translateY}px) scale(${state.scale})`;
+}
+
+function getInitials(name) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join("");
+}
+
+function getMax(items, key) {
+  return Math.max(...items.map((item) => item[key]));
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
