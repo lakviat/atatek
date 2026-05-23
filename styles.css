@@ -6,6 +6,7 @@
   --panel: #f8fafc;
   --panel-strong: #eef2f6;
   --accent: #1b6f5d;
+  --heart: #2f9fb3;
   --shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
 }
 
@@ -138,9 +139,10 @@ h1 {
 
 .tree-lines path {
   fill: none;
-  stroke: var(--line);
+  stroke: #c2c9d3;
   stroke-width: 2;
-  stroke-linecap: round;
+  stroke-linecap: square;
+  stroke-linejoin: round;
 }
 
 .tree-nodes {
@@ -152,7 +154,7 @@ h1 {
   position: absolute;
   display: grid;
   justify-items: center;
-  width: 168px;
+  width: 170px;
   transform: translate(-50%, -50%);
   border: 0;
   background: transparent;
@@ -161,7 +163,7 @@ h1 {
 }
 
 .person-card.has-partner {
-  width: 190px;
+  width: 300px;
 }
 
 .person-card:focus-visible .portrait {
@@ -169,24 +171,68 @@ h1 {
   outline-offset: 5px;
 }
 
-.portrait-pair {
+.couple-unit {
   position: relative;
-  display: block;
-  width: 132px;
+  display: grid;
+  grid-template-columns: 96px 56px 96px;
+  align-items: start;
+  justify-content: center;
+  width: 260px;
+}
+
+.couple-person {
+  display: grid;
+  justify-items: center;
+  min-width: 0;
+}
+
+.couple-link {
+  position: relative;
+  display: grid;
+  place-items: center;
   height: 88px;
 }
 
-.portrait-pair .portrait {
+.couple-link::before,
+.couple-link::after {
   position: absolute;
-  top: 0;
+  top: 43px;
+  width: 20px;
+  height: 2px;
+  background: #c2c9d3;
+  content: "";
 }
 
-.portrait-left {
+.couple-link::before {
   left: 0;
 }
 
-.portrait-right {
+.couple-link::after {
   right: 0;
+}
+
+.couple-heart {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--heart);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.couple-label {
+  max-width: 110px;
+  margin-top: 8px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.18;
+  text-align: center;
 }
 
 .portrait {
@@ -194,10 +240,10 @@ h1 {
   width: 88px;
   height: 88px;
   overflow: hidden;
-  border: 1px solid #dbe2ea;
+  border: 4px solid #2f9fb3;
   border-radius: 999px;
   background: linear-gradient(135deg, #ecfdf5, #f1f5f9 52%, #fff7ed);
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.1);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.11);
 }
 
 .portrait img {
@@ -218,8 +264,8 @@ h1 {
 
 .order-badge {
   position: absolute;
-  top: -6px;
-  right: 21px;
+  top: -8px;
+  right: 26px;
   display: grid;
   place-items: center;
   width: 28px;
@@ -233,9 +279,13 @@ h1 {
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.16);
 }
 
+.person-card.has-partner .order-badge {
+  right: 84px;
+}
+
 .person-name {
-  max-width: 150px;
-  margin-top: 11px;
+  max-width: 170px;
+  margin-top: 10px;
   color: #17202a;
   font-size: 15px;
   font-weight: 650;
@@ -409,8 +459,34 @@ h1 {
     width: 154px;
   }
 
-  .person-card.has-partner {
-    width: 178px;
+.person-card.has-partner {
+    width: 272px;
+  }
+
+  .couple-unit {
+    grid-template-columns: 86px 48px 86px;
+    width: 232px;
+  }
+
+  .couple-link {
+    height: 78px;
+  }
+
+  .couple-link::before,
+  .couple-link::after {
+    top: 38px;
+    width: 17px;
+  }
+
+  .couple-label {
+    max-width: 98px;
+    font-size: 11px;
+  }
+
+  .portrait {
+    width: 78px;
+    height: 78px;
+    border-width: 3px;
   }
 
   .tree-controls {

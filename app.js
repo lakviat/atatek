@@ -130,11 +130,13 @@ function assignTreeLayout(people) {
 
 function createLine(parent, child) {
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  const midpointY = parent.y + (child.y - parent.y) / 2;
+  const parentBottomY = parent.y + (parent.partner ? 84 : 62);
+  const childTopY = child.y - 62;
+  const midpointY = parentBottomY + (childTopY - parentBottomY) / 2;
 
   path.setAttribute(
     "d",
-    `M ${parent.x} ${parent.y + 56} C ${parent.x} ${midpointY}, ${child.x} ${midpointY}, ${child.x} ${child.y - 56}`
+    `M ${parent.x} ${parentBottomY} L ${parent.x} ${midpointY} L ${child.x} ${midpointY} L ${child.x} ${childTopY}`
   );
 
   return path;
@@ -167,9 +169,18 @@ function createPersonButton(person) {
 function cardPortraitMarkup(person) {
   if (person.partner) {
     return `
-      <span class="portrait-pair" aria-hidden="true">
-        <span class="portrait portrait-left">${portraitMarkup(person)}</span>
-        <span class="portrait portrait-right">${portraitMarkup(person.partner)}</span>
+      <span class="couple-unit" aria-hidden="true">
+        <span class="couple-person">
+          <span class="portrait">${portraitMarkup(person)}</span>
+          <span class="couple-label">${person.name}</span>
+        </span>
+        <span class="couple-link">
+          <span class="couple-heart">♥</span>
+        </span>
+        <span class="couple-person">
+          <span class="portrait">${portraitMarkup(person.partner)}</span>
+          <span class="couple-label">${person.partner.name}</span>
+        </span>
       </span>
     `;
   }
