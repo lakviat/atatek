@@ -2,7 +2,7 @@
 
 ## Project
 
-Atatek is a simple family ancestry webpage for the Junos Shalia family line.
+Atatek is a simple family ancestry webpage for the Dzhunushaliev Family Line.
 The name comes from Kyrgyz and refers to ancestry.
 
 The site is intended to be deployed later with GitHub Pages, likely under a
@@ -83,7 +83,7 @@ Example structure:
 ## Open Questions
 
 - Should the project spelling be `Atatek`, `Atatech`, or another transliteration?
-- What is the exact preferred spelling of `Junos Shalia`?
+- Confirm the exact preferred spelling and capitalization of `Dzhunushaliev Family Line`.
 - What last-name letter or branch label should appear in the title?
 - Should the first version be plain HTML/CSS/JavaScript or a small React app?
 - Should photos open as a full-screen lightbox, side panel, or centered modal?

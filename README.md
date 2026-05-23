@@ -1,6 +1,6 @@
 # Atatek
 
-Atatek is a simple family ancestry tree website for the Junos Shalia family line.
+Atatek is a simple family ancestry tree website for the Dzhunushaliev Family Line.
 
 The first version is a static GitHub Pages-ready site with:
 
