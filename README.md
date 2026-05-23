@@ -71,6 +71,7 @@ Family-of-origin and marriage branches are separate visually:
 - Parent/sibling lines connect to the individual person's portrait.
 - Children from a marriage connect from the couple midpoint.
 - Spouses are shown in the same visual node, but they are not treated as siblings of the person's brothers or sisters.
+- If a person has siblings and also a spouse, use two nodes: one individual node in the sibling branch, then one couple node below it for the marriage/family branch.
 
 For married couples, use one family node with `partner`:
 

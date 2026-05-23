@@ -16,19 +16,17 @@
     {
       "id": "grandpa",
       "name": "Grandpa",
+      "order": 1,
       "generation": 1,
       "parents": ["grandpa-father"],
       "photo": "",
-      "partner": {
-        "name": "Grandmother",
-        "photo": "assets/people/family/grandmother.jpg"
-      },
       "years": "Photo and name to be added",
-      "note": "Central grandpa and grandmother couple placeholder. The marked sons and daughters in the reference photo are connected below."
+      "note": "Grandpa as an individual in his birth-family sibling branch. His marriage/family branch with grandmother is shown below."
     },
     {
       "id": "grandpas-sister",
       "name": "Grandpa's Sister",
+      "order": 2,
       "generation": 1,
       "parents": ["grandpa-father"],
       "photo": "assets/people/family/grandpa-siblings/grandpas-sister.jpg",
@@ -39,11 +37,24 @@
       "note": "Grandpa's sister. Passed away on May 23, 2026 at age 92. Exact birth date to be added."
     },
     {
+      "id": "grandpa-grandmother-family",
+      "name": "Grandpa",
+      "generation": 2,
+      "parents": ["grandpa"],
+      "photo": "",
+      "partner": {
+        "name": "Grandmother",
+        "photo": "assets/people/family/grandmother.jpg"
+      },
+      "years": "Photo and name to be added",
+      "note": "Marriage/family branch for grandpa and grandmother. Their children branch from this couple node."
+    },
+    {
       "id": "child-01",
       "name": "Child 1",
       "order": 1,
       "generation": 2,
-      "parents": ["grandpa"],
+      "parents": ["grandpa-grandmother-family"],
       "photo": "assets/people/from-reference/child-01.jpg",
       "years": "Name to be added",
       "note": "Marked as number 1 in the reference photo. Temporary profile crop from the group photo."
@@ -53,7 +64,7 @@
       "name": "Child 2",
       "order": 2,
       "generation": 2,
-      "parents": ["grandpa"],
+      "parents": ["grandpa-grandmother-family"],
       "photo": "assets/people/from-reference/child-02.jpg",
       "years": "Name to be added",
       "note": "Marked as number 2 in the reference photo. Temporary profile crop from the group photo."
@@ -63,7 +74,7 @@
       "name": "Child 3",
       "order": 3,
       "generation": 2,
-      "parents": ["grandpa"],
+      "parents": ["grandpa-grandmother-family"],
       "photo": "assets/people/from-reference/child-03.jpg",
       "years": "Name to be added",
       "note": "Marked as number 3 in the reference photo. Temporary profile crop from the group photo."
@@ -73,7 +84,7 @@
       "name": "Child 4",
       "order": 4,
       "generation": 2,
-      "parents": ["grandpa"],
+      "parents": ["grandpa-grandmother-family"],
       "photo": "assets/people/from-reference/child-04.jpg",
       "years": "Name to be added",
       "note": "Marked as number 4 in the reference photo. Temporary profile crop from the group photo."
@@ -83,7 +94,7 @@
       "name": "Child 5",
       "order": 5,
       "generation": 2,
-      "parents": ["grandpa"],
+      "parents": ["grandpa-grandmother-family"],
       "photo": "assets/people/from-reference/child-05.jpg",
       "years": "Name to be added",
       "note": "Marked as number 5 in the reference photo. Temporary profile crop from the group photo."
@@ -93,7 +104,7 @@
       "name": "Child 6",
       "order": 6,
       "generation": 2,
-      "parents": ["grandpa"],
+      "parents": ["grandpa-grandmother-family"],
       "photo": "assets/people/from-reference/child-06-family/father.jpg",
       "partner": {
         "name": "Child 6's Wife",
@@ -107,7 +118,7 @@
       "name": "Child 7",
       "order": 7,
       "generation": 2,
-      "parents": ["grandpa"],
+      "parents": ["grandpa-grandmother-family"],
       "photo": "assets/people/from-reference/child-07.jpg",
       "years": "Name to be added",
       "note": "Marked as number 7 in the reference photo. Temporary profile crop from the group photo."
@@ -117,7 +128,7 @@
       "name": "Child 8",
       "order": 8,
       "generation": 2,
-      "parents": ["grandpa"],
+      "parents": ["grandpa-grandmother-family"],
       "photo": "assets/people/from-reference/child-08.jpg",
       "years": "Name to be added",
       "note": "Marked as number 8 in the reference photo. Temporary profile crop from the group photo."

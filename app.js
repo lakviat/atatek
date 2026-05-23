@@ -33,7 +33,7 @@ const closeReference = document.querySelector("#closeReference");
 init();
 
 async function init() {
-  const response = await fetch("data/people.json");
+  const response = await fetch("data/people.json?v=20260523-branch-split", { cache: "no-store" });
   const data = await response.json();
   state.people = data.people;
 
