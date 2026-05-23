@@ -53,3 +53,26 @@ Temporary crops from the marked group photo live in:
 `assets/people/from-reference/`
 
 These are only draft portraits and can be replaced later with cleaner individual photos while keeping the same JSON structure.
+
+## Layout Strategy
+
+Large branches are laid out by subtree size. A person or couple with many descendants gets more horizontal space, while branches with no children stay compact.
+
+For married couples, use one family node with `partner`:
+
+```json
+{
+  "id": "child-06",
+  "name": "Child 6",
+  "partner": {
+    "name": "Child 6's Wife",
+    "photo": "assets/people/from-reference/child-06-family/wife.jpg"
+  }
+}
+```
+
+Children should reference the main couple node ID in `parents`, for example:
+
+```json
+"parents": ["child-06"]
+```

@@ -6,42 +6,32 @@
       "generation": 0,
       "parents": [],
       "photo": "",
+      "partner": {
+        "name": "Grandpa's Mother",
+        "photo": ""
+      },
       "years": "Name to be added",
-      "note": "Placeholder for grandpa's father. This ancestor can be replaced when names and photos are ready."
-    },
-    {
-      "id": "grandpa-mother",
-      "name": "Grandpa's Mother",
-      "generation": 0,
-      "parents": [],
-      "photo": "",
-      "years": "Name to be added",
-      "note": "Placeholder for grandpa's mother. This ancestor can be replaced when names and photos are ready."
+      "note": "Placeholder couple for grandpa's parents. These ancestors can be replaced when names and photos are ready."
     },
     {
       "id": "grandpa",
       "name": "Grandpa",
       "generation": 1,
-      "parents": ["grandpa-father", "grandpa-mother"],
+      "parents": ["grandpa-father"],
       "photo": "",
+      "partner": {
+        "name": "Grandmother",
+        "photo": ""
+      },
       "years": "Photo and name to be added",
-      "note": "Central grandpa placeholder. The marked sons and daughters in the reference photo are connected below."
-    },
-    {
-      "id": "grandma",
-      "name": "Grandmother",
-      "generation": 1,
-      "parents": [],
-      "photo": "",
-      "years": "Photo and name to be added",
-      "note": "Central grandmother placeholder. The marked sons and daughters in the reference photo are connected below."
+      "note": "Central grandpa and grandmother couple placeholder. The marked sons and daughters in the reference photo are connected below."
     },
     {
       "id": "child-01",
       "name": "Child 1",
       "order": 1,
       "generation": 2,
-      "parents": ["grandpa", "grandma"],
+      "parents": ["grandpa"],
       "photo": "assets/people/from-reference/child-01.jpg",
       "years": "Name to be added",
       "note": "Marked as number 1 in the reference photo. Temporary profile crop from the group photo."
@@ -51,7 +41,7 @@
       "name": "Child 2",
       "order": 2,
       "generation": 2,
-      "parents": ["grandpa", "grandma"],
+      "parents": ["grandpa"],
       "photo": "assets/people/from-reference/child-02.jpg",
       "years": "Name to be added",
       "note": "Marked as number 2 in the reference photo. Temporary profile crop from the group photo."
@@ -61,7 +51,7 @@
       "name": "Child 3",
       "order": 3,
       "generation": 2,
-      "parents": ["grandpa", "grandma"],
+      "parents": ["grandpa"],
       "photo": "assets/people/from-reference/child-03.jpg",
       "years": "Name to be added",
       "note": "Marked as number 3 in the reference photo. Temporary profile crop from the group photo."
@@ -71,7 +61,7 @@
       "name": "Child 4",
       "order": 4,
       "generation": 2,
-      "parents": ["grandpa", "grandma"],
+      "parents": ["grandpa"],
       "photo": "assets/people/from-reference/child-04.jpg",
       "years": "Name to be added",
       "note": "Marked as number 4 in the reference photo. Temporary profile crop from the group photo."
@@ -81,7 +71,7 @@
       "name": "Child 5",
       "order": 5,
       "generation": 2,
-      "parents": ["grandpa", "grandma"],
+      "parents": ["grandpa"],
       "photo": "assets/people/from-reference/child-05.jpg",
       "years": "Name to be added",
       "note": "Marked as number 5 in the reference photo. Temporary profile crop from the group photo."
@@ -91,7 +81,7 @@
       "name": "Child 6",
       "order": 6,
       "generation": 2,
-      "parents": ["grandpa", "grandma"],
+      "parents": ["grandpa"],
       "photo": "assets/people/from-reference/child-06-family/father.jpg",
       "partner": {
         "name": "Child 6's Wife",
@@ -105,7 +95,7 @@
       "name": "Child 7",
       "order": 7,
       "generation": 2,
-      "parents": ["grandpa", "grandma"],
+      "parents": ["grandpa"],
       "photo": "assets/people/from-reference/child-07.jpg",
       "years": "Name to be added",
       "note": "Marked as number 7 in the reference photo. Temporary profile crop from the group photo."
@@ -115,7 +105,7 @@
       "name": "Child 8",
       "order": 8,
       "generation": 2,
-      "parents": ["grandpa", "grandma"],
+      "parents": ["grandpa"],
       "photo": "assets/people/from-reference/child-08.jpg",
       "years": "Name to be added",
       "note": "Marked as number 8 in the reference photo. Temporary profile crop from the group photo."
@@ -126,10 +116,6 @@
       "generation": 3,
       "parents": ["child-02"],
       "photo": "",
-      "position": {
-        "x": 400,
-        "y": 690
-      },
       "years": "To be added",
       "note": "Placeholder showing where each marked child can branch into more descendants."
     },
@@ -140,10 +126,6 @@
       "generation": 3,
       "parents": ["child-06"],
       "photo": "assets/people/from-reference/child-06-family/kid-01.jpg",
-      "position": {
-        "x": 1020,
-        "y": 690
-      },
       "years": "To be added",
       "note": "First child of number 6 and his wife, based on the second marked reference photo."
     },
@@ -154,10 +136,6 @@
       "generation": 3,
       "parents": ["child-06"],
       "photo": "assets/people/from-reference/child-06-family/kid-02.jpg",
-      "position": {
-        "x": 1240,
-        "y": 690
-      },
       "years": "To be added",
       "note": "Second child of number 6 and his wife, based on the second marked reference photo."
     },
@@ -168,10 +146,6 @@
       "generation": 3,
       "parents": ["child-06"],
       "photo": "assets/people/from-reference/child-06-family/kid-03.jpg",
-      "position": {
-        "x": 1460,
-        "y": 690
-      },
       "years": "To be added",
       "note": "Third child of number 6 and his wife, based on the second marked reference photo."
     },
@@ -182,64 +156,78 @@
       "generation": 3,
       "parents": ["child-06"],
       "photo": "assets/people/from-reference/child-06-family/kid-04.jpg",
-      "position": {
-        "x": 1680,
-        "y": 690
-      },
       "years": "To be added",
       "note": "Fourth child of number 6 and his wife, based on the second marked reference photo."
     },
     {
-      "id": "child-06-kid-01-child-a",
-      "name": "Kid 1 Child",
+      "id": "child-06-kid-01-child-01",
+      "name": "Kid 1 Child 1",
+      "order": 1,
       "generation": 4,
       "parents": ["child-06-kid-01"],
       "photo": "",
-      "position": {
-        "x": 1020,
-        "y": 880
-      },
       "years": "To be added",
-      "note": "Placeholder for the next generation under child 6's first child."
+      "note": "First placeholder child under child 6's first child."
     },
     {
-      "id": "child-06-kid-02-child-a",
-      "name": "Kid 2 Child",
+      "id": "child-06-kid-01-child-02",
+      "name": "Kid 1 Child 2",
+      "order": 2,
       "generation": 4,
-      "parents": ["child-06-kid-02"],
+      "parents": ["child-06-kid-01"],
       "photo": "",
-      "position": {
-        "x": 1240,
-        "y": 880
-      },
       "years": "To be added",
-      "note": "Placeholder for the next generation under child 6's second child."
+      "note": "Second placeholder child under child 6's first child."
     },
     {
-      "id": "child-06-kid-03-child-a",
-      "name": "Kid 3 Child",
+      "id": "child-06-kid-01-child-03",
+      "name": "Kid 1 Child 3",
+      "order": 3,
+      "generation": 4,
+      "parents": ["child-06-kid-01"],
+      "photo": "",
+      "years": "To be added",
+      "note": "Third placeholder child under child 6's first child."
+    },
+    {
+      "id": "child-06-kid-01-child-04",
+      "name": "Kid 1 Child 4",
+      "order": 4,
+      "generation": 4,
+      "parents": ["child-06-kid-01"],
+      "photo": "",
+      "years": "To be added",
+      "note": "Fourth placeholder child under child 6's first child."
+    },
+    {
+      "id": "child-06-kid-03-child-01",
+      "name": "Kid 3 Child 1",
+      "order": 1,
       "generation": 4,
       "parents": ["child-06-kid-03"],
       "photo": "",
-      "position": {
-        "x": 1460,
-        "y": 880
-      },
       "years": "To be added",
-      "note": "Placeholder for the next generation under child 6's third child."
+      "note": "First placeholder child under child 6's third child."
     },
     {
-      "id": "child-06-kid-04-child-a",
-      "name": "Kid 4 Child",
+      "id": "child-06-kid-03-child-02",
+      "name": "Kid 3 Child 2",
+      "order": 2,
       "generation": 4,
-      "parents": ["child-06-kid-04"],
+      "parents": ["child-06-kid-03"],
       "photo": "",
-      "position": {
-        "x": 1680,
-        "y": 880
-      },
       "years": "To be added",
-      "note": "Placeholder for the next generation under child 6's fourth child."
+      "note": "Second placeholder child under child 6's third child."
+    },
+    {
+      "id": "child-06-kid-03-child-03",
+      "name": "Kid 3 Child 3",
+      "order": 3,
+      "generation": 4,
+      "parents": ["child-06-kid-03"],
+      "photo": "",
+      "years": "To be added",
+      "note": "Third placeholder child under child 6's third child."
     }
   ]
 }

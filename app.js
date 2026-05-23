@@ -37,30 +37,10 @@ async function init() {
 
 function renderTree() {
   const peopleById = new Map(state.people.map((person) => [person.id, person]));
-  const generations = groupByGeneration(state.people);
+  assignTreeLayout(state.people);
 
-  const horizontalGap = 230;
-  const verticalGap = 190;
-  const startX = 170;
-  const startY = 120;
-
-  generations.forEach((generation, generationIndex) => {
-    const rowWidth = (generation.length - 1) * horizontalGap;
-    const rowStartX = startX + Math.max(0, (760 - rowWidth) / 2);
-
-    generation.forEach((person, personIndex) => {
-      person.x = rowStartX + personIndex * horizontalGap;
-      person.y = startY + generationIndex * verticalGap;
-
-      if (person.position) {
-        person.x = person.position.x ?? person.x;
-        person.y = person.position.y ?? person.y;
-      }
-    });
-  });
-
-  canvas.style.width = `${Math.max(1200, getMax(state.people, "x") + 220)}px`;
-  canvas.style.height = `${Math.max(780, getMax(state.people, "y") + 190)}px`;
+  canvas.style.width = `${Math.max(1200, getMax(state.people, "x") + 260)}px`;
+  canvas.style.height = `${Math.max(780, getMax(state.people, "y") + 220)}px`;
   linesLayer.setAttribute("viewBox", `0 0 ${canvas.offsetWidth} ${canvas.offsetHeight}`);
 
   nodesLayer.innerHTML = "";
@@ -78,14 +58,66 @@ function renderTree() {
   });
 }
 
-function groupByGeneration(people) {
-  return people
-    .reduce((rows, person) => {
-      rows[person.generation] ||= [];
-      rows[person.generation].push(person);
-      return rows;
-    }, [])
-    .filter(Boolean);
+function assignTreeLayout(people) {
+  const childrenByParent = new Map();
+  const peopleById = new Map(people.map((person) => [person.id, person]));
+  const childIds = new Set();
+  const leafGap = 230;
+  const levelGap = 190;
+  const startX = 150;
+  const startY = 120;
+  let cursorX = startX;
+
+  people.forEach((person) => {
+    const primaryParentId = person.parents?.[0];
+
+    if (!primaryParentId || !peopleById.has(primaryParentId)) {
+      return;
+    }
+
+    childIds.add(person.id);
+
+    if (!childrenByParent.has(primaryParentId)) {
+      childrenByParent.set(primaryParentId, []);
+    }
+
+    childrenByParent.get(primaryParentId).push(person);
+  });
+
+  people.forEach((person) => {
+    if (!person.parents?.length) {
+      return;
+    }
+
+    person.generation = Math.max(...person.parents.map((parentId) => peopleById.get(parentId)?.generation ?? 0)) + 1;
+  });
+
+  childrenByParent.forEach((children) => {
+    children.sort((a, b) => (a.order ?? 999) - (b.order ?? 999) || a.name.localeCompare(b.name));
+  });
+
+  const roots = people
+    .filter((person) => !childIds.has(person.id))
+    .sort((a, b) => (a.order ?? 999) - (b.order ?? 999) || a.name.localeCompare(b.name));
+
+  roots.forEach((root) => {
+    layoutBranch(root);
+    cursorX += leafGap;
+  });
+
+  function layoutBranch(person) {
+    const children = childrenByParent.get(person.id) ?? [];
+    person.y = startY + person.generation * levelGap;
+
+    if (!children.length) {
+      person.x = cursorX;
+      cursorX += leafGap;
+      return;
+    }
+
+    children.forEach(layoutBranch);
+    person.x = (children[0].x + children[children.length - 1].x) / 2;
+  }
 }
 
 function createLine(parent, child) {
