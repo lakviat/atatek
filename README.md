@@ -48,6 +48,14 @@ Profile photos should be placed in `assets/people/` and referenced from the JSON
 
 If `photo` is empty, the site shows an initial-based placeholder portrait.
 
+Original uploaded photos are preserved in:
+
+`assets/uploads/originals/`
+
+Cleaned or cropped web-ready profile photos are stored separately in:
+
+`assets/people/`
+
 Temporary crops from the marked group photo live in:
 
 `assets/people/from-reference/`
