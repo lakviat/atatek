@@ -27,6 +27,18 @@
       "note": "Central grandpa and grandmother couple placeholder. The marked sons and daughters in the reference photo are connected below."
     },
     {
+      "id": "grandpas-sister",
+      "name": "Grandpa's Sister",
+      "generation": 1,
+      "parents": ["grandpa-father"],
+      "photo": "assets/people/family/grandpa-siblings/grandpas-sister.jpg",
+      "birthDateLabel": "To be added",
+      "deathDate": "2026-05-23",
+      "ageAtDeath": 92,
+      "years": "To be added - 2026",
+      "note": "Grandpa's sister. Passed away on May 23, 2026 at age 92. Exact birth date to be added."
+    },
+    {
       "id": "child-01",
       "name": "Child 1",
       "order": 1,

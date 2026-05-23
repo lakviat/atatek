@@ -153,7 +153,7 @@ function createPersonButton(person) {
     ${cardPortraitMarkup(person)}
     ${person.order ? `<span class="order-badge" aria-label="Marked order ${person.order}">${person.order}</span>` : ""}
     <span class="person-name">${getDisplayName(person)}</span>
-    <span class="person-meta">${person.years || `Generation ${person.generation + 1}`}</span>
+    <span class="person-meta">${getTimeline(person) || `Generation ${person.generation + 1}`}</span>
   `;
   button.addEventListener("click", (event) => {
     if (state.suppressClick) {
@@ -203,7 +203,8 @@ function openProfile(person) {
     document.querySelector("#profileGeneration").textContent += ` | Marked child ${person.order}`;
   }
   document.querySelector("#profileName").textContent = getDisplayName(person);
-  document.querySelector("#profileYears").textContent = person.years || "Dates to be added";
+  document.querySelector("#profileYears").textContent = getTimeline(person) || "Dates to be added";
+  document.querySelector("#profileFacts").innerHTML = profileFactsMarkup(person);
   document.querySelector("#profileNote").textContent =
     person.note || "Profile details and biography can be added here.";
 
@@ -227,6 +228,46 @@ function profilePhotoMarkup(person) {
       </figure>
     </div>
   `;
+}
+
+function profileFactsMarkup(person) {
+  const facts = [
+    ["Birth", formatDateValue(person.birthDate, person.birthDateLabel || "To be added")],
+    ["Death", formatDateValue(person.deathDate, person.deathDateLabel || "To be added")],
+    ["Age", person.ageAtDeath ? `${person.ageAtDeath}` : "To be added"]
+  ];
+
+  return facts
+    .map(([label, value]) => `<div><dt>${label}</dt><dd>${value}</dd></div>`)
+    .join("");
+}
+
+function getTimeline(person) {
+  if (person.birthDate || person.birthDateLabel || person.deathDate || person.deathDateLabel) {
+    const birth = formatDateValue(person.birthDate, person.birthDateLabel || "?");
+    const death = formatDateValue(person.deathDate, person.deathDateLabel || "Present");
+    return `${birth} - ${death}`;
+  }
+
+  return person.years || "";
+}
+
+function formatDateValue(value, fallback) {
+  if (!value) {
+    return fallback;
+  }
+
+  const date = new Date(`${value}T00:00:00`);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("en", {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  }).format(date);
 }
 
 function bindControls() {

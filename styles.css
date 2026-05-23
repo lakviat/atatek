@@ -402,6 +402,7 @@ h1 {
 }
 
 .profile-years,
+.profile-facts,
 .profile-note {
   color: var(--muted);
   font-size: 16px;
@@ -410,6 +411,27 @@ h1 {
 
 .profile-years {
   margin: 12px 0 0;
+}
+
+.profile-facts {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0 0;
+}
+
+.profile-facts div {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 12px;
+}
+
+.profile-facts dt {
+  color: #344054;
+  font-weight: 700;
+}
+
+.profile-facts dd {
+  margin: 0;
 }
 
 .profile-note {
