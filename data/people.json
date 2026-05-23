@@ -92,9 +92,13 @@
       "order": 6,
       "generation": 2,
       "parents": ["grandpa", "grandma"],
-      "photo": "assets/people/from-reference/child-06.jpg",
+      "photo": "assets/people/from-reference/child-06-family/father.jpg",
+      "partner": {
+        "name": "Child 6's Wife",
+        "photo": "assets/people/from-reference/child-06-family/wife.jpg"
+      },
       "years": "Name to be added",
-      "note": "Marked as number 6 in the reference photo. Temporary profile crop from the group photo."
+      "note": "Marked as number 6 in the first reference photo. This couple node includes his wife, and their four marked children branch below."
     },
     {
       "id": "child-07",
@@ -122,17 +126,120 @@
       "generation": 3,
       "parents": ["child-02"],
       "photo": "",
+      "position": {
+        "x": 400,
+        "y": 690
+      },
       "years": "To be added",
       "note": "Placeholder showing where each marked child can branch into more descendants."
     },
     {
-      "id": "child-06-descendant-a",
-      "name": "Child 6 Descendant A",
+      "id": "child-06-kid-01",
+      "name": "Child 6 Kid 1",
+      "order": 1,
       "generation": 3,
       "parents": ["child-06"],
-      "photo": "",
+      "photo": "assets/people/from-reference/child-06-family/kid-01.jpg",
+      "position": {
+        "x": 1020,
+        "y": 690
+      },
       "years": "To be added",
-      "note": "Placeholder showing where each marked child can branch into more descendants."
+      "note": "First child of number 6 and his wife, based on the second marked reference photo."
+    },
+    {
+      "id": "child-06-kid-02",
+      "name": "Child 6 Kid 2",
+      "order": 2,
+      "generation": 3,
+      "parents": ["child-06"],
+      "photo": "assets/people/from-reference/child-06-family/kid-02.jpg",
+      "position": {
+        "x": 1240,
+        "y": 690
+      },
+      "years": "To be added",
+      "note": "Second child of number 6 and his wife, based on the second marked reference photo."
+    },
+    {
+      "id": "child-06-kid-03",
+      "name": "Child 6 Kid 3",
+      "order": 3,
+      "generation": 3,
+      "parents": ["child-06"],
+      "photo": "assets/people/from-reference/child-06-family/kid-03.jpg",
+      "position": {
+        "x": 1460,
+        "y": 690
+      },
+      "years": "To be added",
+      "note": "Third child of number 6 and his wife, based on the second marked reference photo."
+    },
+    {
+      "id": "child-06-kid-04",
+      "name": "Child 6 Kid 4",
+      "order": 4,
+      "generation": 3,
+      "parents": ["child-06"],
+      "photo": "assets/people/from-reference/child-06-family/kid-04.jpg",
+      "position": {
+        "x": 1680,
+        "y": 690
+      },
+      "years": "To be added",
+      "note": "Fourth child of number 6 and his wife, based on the second marked reference photo."
+    },
+    {
+      "id": "child-06-kid-01-child-a",
+      "name": "Kid 1 Child",
+      "generation": 4,
+      "parents": ["child-06-kid-01"],
+      "photo": "",
+      "position": {
+        "x": 1020,
+        "y": 880
+      },
+      "years": "To be added",
+      "note": "Placeholder for the next generation under child 6's first child."
+    },
+    {
+      "id": "child-06-kid-02-child-a",
+      "name": "Kid 2 Child",
+      "generation": 4,
+      "parents": ["child-06-kid-02"],
+      "photo": "",
+      "position": {
+        "x": 1240,
+        "y": 880
+      },
+      "years": "To be added",
+      "note": "Placeholder for the next generation under child 6's second child."
+    },
+    {
+      "id": "child-06-kid-03-child-a",
+      "name": "Kid 3 Child",
+      "generation": 4,
+      "parents": ["child-06-kid-03"],
+      "photo": "",
+      "position": {
+        "x": 1460,
+        "y": 880
+      },
+      "years": "To be added",
+      "note": "Placeholder for the next generation under child 6's third child."
+    },
+    {
+      "id": "child-06-kid-04-child-a",
+      "name": "Kid 4 Child",
+      "generation": 4,
+      "parents": ["child-06-kid-04"],
+      "photo": "",
+      "position": {
+        "x": 1680,
+        "y": 880
+      },
+      "years": "To be added",
+      "note": "Placeholder for the next generation under child 6's fourth child."
     }
   ]
 }

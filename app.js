@@ -7,7 +7,9 @@ const state = {
   dragStartX: 0,
   dragStartY: 0,
   startX: 0,
-  startY: 0
+  startY: 0,
+  hasMoved: false,
+  suppressClick: false
 };
 
 const viewport = document.querySelector("#treeViewport");
@@ -30,6 +32,7 @@ async function init() {
   renderTree();
   bindControls();
   centerTree();
+  window.addEventListener("resize", centerTree);
 }
 
 function renderTree() {
@@ -48,6 +51,11 @@ function renderTree() {
     generation.forEach((person, personIndex) => {
       person.x = rowStartX + personIndex * horizontalGap;
       person.y = startY + generationIndex * verticalGap;
+
+      if (person.position) {
+        person.x = person.position.x ?? person.x;
+        person.y = person.position.y ?? person.y;
+      }
     });
   });
 
@@ -94,19 +102,39 @@ function createLine(parent, child) {
 
 function createPersonButton(person) {
   const button = document.createElement("button");
-  button.className = "person-card";
+  button.className = `person-card${person.partner ? " has-partner" : ""}`;
   button.type = "button";
   button.style.left = `${person.x}px`;
   button.style.top = `${person.y}px`;
-  button.setAttribute("aria-label", `Open profile for ${person.name}`);
+  button.setAttribute("aria-label", `Open profile for ${getDisplayName(person)}`);
   button.innerHTML = `
-    <span class="portrait">${portraitMarkup(person)}</span>
+    ${cardPortraitMarkup(person)}
     ${person.order ? `<span class="order-badge" aria-label="Marked order ${person.order}">${person.order}</span>` : ""}
-    <span class="person-name">${person.name}</span>
+    <span class="person-name">${getDisplayName(person)}</span>
     <span class="person-meta">${person.years || `Generation ${person.generation + 1}`}</span>
   `;
-  button.addEventListener("click", () => openProfile(person));
+  button.addEventListener("click", (event) => {
+    if (state.suppressClick) {
+      event.preventDefault();
+      return;
+    }
+
+    openProfile(person);
+  });
   return button;
+}
+
+function cardPortraitMarkup(person) {
+  if (person.partner) {
+    return `
+      <span class="portrait-pair" aria-hidden="true">
+        <span class="portrait portrait-left">${portraitMarkup(person)}</span>
+        <span class="portrait portrait-right">${portraitMarkup(person.partner)}</span>
+      </span>
+    `;
+  }
+
+  return `<span class="portrait">${portraitMarkup(person)}</span>`;
 }
 
 function portraitMarkup(person) {
@@ -118,17 +146,36 @@ function portraitMarkup(person) {
 }
 
 function openProfile(person) {
-  document.querySelector("#profilePhoto").innerHTML = portraitMarkup(person);
+  document.querySelector("#profilePhoto").innerHTML = profilePhotoMarkup(person);
   document.querySelector("#profileGeneration").textContent = `Generation ${person.generation + 1}`;
   if (person.order) {
     document.querySelector("#profileGeneration").textContent += ` | Marked child ${person.order}`;
   }
-  document.querySelector("#profileName").textContent = person.name;
+  document.querySelector("#profileName").textContent = getDisplayName(person);
   document.querySelector("#profileYears").textContent = person.years || "Dates to be added";
   document.querySelector("#profileNote").textContent =
     person.note || "Profile details and biography can be added here.";
 
   dialog.showModal();
+}
+
+function profilePhotoMarkup(person) {
+  if (!person.partner) {
+    return portraitMarkup(person);
+  }
+
+  return `
+    <div class="profile-photo-grid">
+      <figure>
+        ${portraitMarkup(person)}
+        <figcaption>${person.name}</figcaption>
+      </figure>
+      <figure>
+        ${portraitMarkup(person.partner)}
+        <figcaption>${person.partner.name}</figcaption>
+      </figure>
+    </div>
+  `;
 }
 
 function bindControls() {
@@ -161,11 +208,9 @@ function onWheel(event) {
 }
 
 function onPointerDown(event) {
-  if (event.target.closest(".person-card")) {
-    return;
-  }
-
+  event.preventDefault();
   state.dragging = true;
+  state.hasMoved = false;
   state.dragStartX = event.clientX;
   state.dragStartY = event.clientY;
   state.startX = state.translateX;
@@ -179,12 +224,23 @@ function onPointerMove(event) {
     return;
   }
 
+  event.preventDefault();
+  const movedX = event.clientX - state.dragStartX;
+  const movedY = event.clientY - state.dragStartY;
+  state.hasMoved = state.hasMoved || Math.hypot(movedX, movedY) > 6;
   state.translateX = state.startX + event.clientX - state.dragStartX;
   state.translateY = state.startY + event.clientY - state.dragStartY;
   applyTransform();
 }
 
 function onPointerUp(event) {
+  if (state.hasMoved) {
+    state.suppressClick = true;
+    window.setTimeout(() => {
+      state.suppressClick = false;
+    }, 250);
+  }
+
   state.dragging = false;
   viewport.classList.remove("is-dragging");
 
@@ -221,6 +277,10 @@ function getInitials(name) {
     .slice(0, 2)
     .map((part) => part[0].toUpperCase())
     .join("");
+}
+
+function getDisplayName(person) {
+  return person.partner ? `${person.name} & ${person.partner.name}` : person.name;
 }
 
 function getMax(items, key) {
