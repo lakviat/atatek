@@ -135,9 +135,9 @@
       "order": 2,
       "generation": 3,
       "parents": ["child-06"],
-      "photo": "assets/people/from-reference/child-06-family/kid-02.jpg",
+      "photo": "assets/people/family/child-06/kid-02.jpg",
       "years": "To be added",
-      "note": "Second child of number 6 and his wife, based on the second marked reference photo."
+      "note": "Second child of number 6 and his wife. Updated with a cleaner individual photo."
     },
     {
       "id": "child-06-kid-03",
