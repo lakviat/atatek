@@ -130,16 +130,34 @@ function assignTreeLayout(people) {
 
 function createLine(parent, child) {
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  const parentBottomY = parent.y + (parent.partner ? 84 : 62);
-  const childTopY = child.y - 62;
-  const midpointY = parentBottomY + (childTopY - parentBottomY) / 2;
+  const start = getChildBranchAnchor(parent);
+  const end = getParentBranchAnchor(child);
+  const midpointY = start.y + (end.y - start.y) / 2;
 
   path.setAttribute(
     "d",
-    `M ${parent.x} ${parentBottomY} L ${parent.x} ${midpointY} L ${child.x} ${midpointY} L ${child.x} ${childTopY}`
+    `M ${start.x} ${start.y} L ${start.x} ${midpointY} L ${end.x} ${midpointY} L ${end.x} ${end.y}`
   );
 
   return path;
+}
+
+function getParentBranchAnchor(person) {
+  return {
+    x: person.x + getPersonAnchorOffset(person),
+    y: person.y - 62
+  };
+}
+
+function getChildBranchAnchor(person) {
+  return {
+    x: person.x,
+    y: person.y + (person.partner ? 84 : 62)
+  };
+}
+
+function getPersonAnchorOffset(person) {
+  return person.partner ? -76 : 0;
 }
 
 function createPersonButton(person) {
@@ -465,10 +483,13 @@ function centerTree() {
   const canvasHeight = canvas.offsetHeight;
   const viewportWidth = viewport.clientWidth;
   const viewportHeight = viewport.clientHeight;
+  const padding = Math.min(80, Math.max(28, viewportWidth * 0.08));
+  const widthScale = (viewportWidth - padding * 2) / canvasWidth;
+  const heightScale = (viewportHeight - padding * 2) / canvasHeight;
 
-  state.scale = Math.min(0.92, Math.max(0.48, viewportWidth / canvasWidth));
+  state.scale = Math.min(0.92, Math.max(0.26, Math.min(widthScale, heightScale)));
   state.translateX = (viewportWidth - canvasWidth * state.scale) / 2;
-  state.translateY = Math.max(34, (viewportHeight - canvasHeight * state.scale) / 2);
+  state.translateY = Math.max(24, (viewportHeight - canvasHeight * state.scale) / 2);
   applyTransform();
 }
 

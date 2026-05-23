@@ -66,6 +66,12 @@ These are only draft portraits and can be replaced later with cleaner individual
 
 Large branches are laid out by subtree size. A person or couple with many descendants gets more horizontal space, while branches with no children stay compact.
 
+Family-of-origin and marriage branches are separate visually:
+
+- Parent/sibling lines connect to the individual person's portrait.
+- Children from a marriage connect from the couple midpoint.
+- Spouses are shown in the same visual node, but they are not treated as siblings of the person's brothers or sisters.
+
 For married couples, use one family node with `partner`:
 
 ```json
