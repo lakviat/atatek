@@ -17,6 +17,9 @@
         <h1>Atatek</h1>
       </div>
       <div class="tree-controls" aria-label="Tree controls">
+        <button class="text-button" type="button" id="openReference">
+          Reference
+        </button>
         <button class="icon-button" type="button" data-action="zoom-out" aria-label="Zoom out">
           -
         </button>
@@ -51,6 +54,18 @@
           <p class="profile-note" id="profileNote"></p>
         </div>
       </div>
+    </dialog>
+
+    <dialog class="reference-dialog" id="referenceDialog" aria-labelledby="referenceTitle">
+      <button class="close-button" type="button" id="closeReference" aria-label="Close reference">
+        x
+      </button>
+      <figure>
+        <img src="assets/reference/sons-daughters-order.jpg" alt="Marked family group photo showing children numbered 1 through 8">
+        <figcaption id="referenceTitle">
+          Marked order of grandpa's sons and daughters
+        </figcaption>
+      </figure>
     </dialog>
 
     <script src="app.js"></script>

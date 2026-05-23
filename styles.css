@@ -69,6 +69,7 @@ h1 {
 }
 
 .icon-button,
+.text-button,
 .close-button {
   display: grid;
   place-items: center;
@@ -82,9 +83,17 @@ h1 {
 }
 
 .icon-button:hover,
+.text-button:hover,
 .close-button:hover {
   border-color: #b9c2cf;
   background: var(--panel);
+}
+
+.text-button {
+  width: auto;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 650;
 }
 
 .tree-shell {
@@ -149,6 +158,7 @@ h1 {
 }
 
 .portrait {
+  position: relative;
   width: 88px;
   height: 88px;
   overflow: hidden;
@@ -174,6 +184,23 @@ h1 {
   font-weight: 700;
 }
 
+.order-badge {
+  position: absolute;
+  top: -6px;
+  right: 21px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 750;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.16);
+}
+
 .person-name {
   max-width: 150px;
   margin-top: 11px;
@@ -192,7 +219,8 @@ h1 {
   text-align: center;
 }
 
-.profile-dialog {
+.profile-dialog,
+.reference-dialog {
   width: min(760px, calc(100vw - 28px));
   border: 1px solid #d9dee7;
   border-radius: 8px;
@@ -200,7 +228,8 @@ h1 {
   box-shadow: var(--shadow);
 }
 
-.profile-dialog::backdrop {
+.profile-dialog::backdrop,
+.reference-dialog::backdrop {
   background: rgba(17, 24, 39, 0.34);
 }
 
@@ -271,6 +300,31 @@ h1 {
   margin: 18px 0 0;
 }
 
+.reference-dialog {
+  width: min(1040px, calc(100vw - 28px));
+}
+
+.reference-dialog figure {
+  margin: 0;
+  padding: 18px;
+  background: #fff;
+}
+
+.reference-dialog img {
+  display: block;
+  width: 100%;
+  max-height: 76vh;
+  border-radius: 6px;
+  object-fit: contain;
+}
+
+.reference-dialog figcaption {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
 @media (max-width: 720px) {
   body {
     overflow: hidden;
@@ -289,9 +343,14 @@ h1 {
     gap: 6px;
   }
 
-  .icon-button {
+  .icon-button,
+  .text-button {
     min-width: 38px;
     height: 38px;
+  }
+
+  .text-button {
+    padding: 0 10px;
   }
 
   .profile-content {

@@ -20,6 +20,18 @@ python3 -m http.server 5173
 
 Then open `http://localhost:5173`.
 
+## GitHub Pages
+
+Enable Pages in the repository settings:
+
+- Source: `Deploy from a branch`
+- Branch: `main`
+- Folder: `/root`
+
+After GitHub finishes publishing, the site should be available at:
+
+`https://lakviat.github.io/atatek/`
+
 ## Editing People
 
 People are stored in `data/people.json`.

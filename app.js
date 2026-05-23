@@ -16,6 +16,9 @@ const nodesLayer = document.querySelector("#treeNodes");
 const linesLayer = document.querySelector("#treeLines");
 const dialog = document.querySelector("#profileDialog");
 const closeProfile = document.querySelector("#closeProfile");
+const referenceDialog = document.querySelector("#referenceDialog");
+const openReference = document.querySelector("#openReference");
+const closeReference = document.querySelector("#closeReference");
 
 init();
 
@@ -98,6 +101,7 @@ function createPersonButton(person) {
   button.setAttribute("aria-label", `Open profile for ${person.name}`);
   button.innerHTML = `
     <span class="portrait">${portraitMarkup(person)}</span>
+    ${person.order ? `<span class="order-badge" aria-label="Marked order ${person.order}">${person.order}</span>` : ""}
     <span class="person-name">${person.name}</span>
     <span class="person-meta">${person.years || `Generation ${person.generation + 1}`}</span>
   `;
@@ -116,6 +120,9 @@ function portraitMarkup(person) {
 function openProfile(person) {
   document.querySelector("#profilePhoto").innerHTML = portraitMarkup(person);
   document.querySelector("#profileGeneration").textContent = `Generation ${person.generation + 1}`;
+  if (person.order) {
+    document.querySelector("#profileGeneration").textContent += ` | Marked child ${person.order}`;
+  }
   document.querySelector("#profileName").textContent = person.name;
   document.querySelector("#profileYears").textContent = person.years || "Dates to be added";
   document.querySelector("#profileNote").textContent =
@@ -129,6 +136,8 @@ function bindControls() {
   document.querySelector("[data-action='zoom-out']").addEventListener("click", () => zoomBy(0.86));
   document.querySelector("[data-action='reset']").addEventListener("click", centerTree);
   closeProfile.addEventListener("click", () => dialog.close());
+  openReference.addEventListener("click", () => referenceDialog.showModal());
+  closeReference.addEventListener("click", () => referenceDialog.close());
 
   viewport.addEventListener("wheel", onWheel, { passive: false });
   viewport.addEventListener("pointerdown", onPointerDown);
