@@ -47,3 +47,9 @@ Profile photos should be placed in `assets/people/` and referenced from the JSON
 ```
 
 If `photo` is empty, the site shows an initial-based placeholder portrait.
+
+Temporary crops from the marked group photo live in:
+
+`assets/people/from-reference/`
+
+These are only draft portraits and can be replaced later with cleaner individual photos while keeping the same JSON structure.

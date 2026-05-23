@@ -28,84 +28,93 @@
       "note": "Central grandpa placeholder. The marked sons and daughters in the reference photo are connected below."
     },
     {
+      "id": "grandma",
+      "name": "Grandmother",
+      "generation": 1,
+      "parents": [],
+      "photo": "",
+      "years": "Photo and name to be added",
+      "note": "Central grandmother placeholder. The marked sons and daughters in the reference photo are connected below."
+    },
+    {
       "id": "child-01",
       "name": "Child 1",
       "order": 1,
       "generation": 2,
-      "parents": ["grandpa"],
-      "photo": "",
+      "parents": ["grandpa", "grandma"],
+      "photo": "assets/people/from-reference/child-01.jpg",
       "years": "Name to be added",
-      "note": "Marked as number 1 in the reference photo."
+      "note": "Marked as number 1 in the reference photo. Temporary profile crop from the group photo."
     },
     {
       "id": "child-02",
       "name": "Child 2",
       "order": 2,
       "generation": 2,
-      "parents": ["grandpa"],
-      "photo": "",
+      "parents": ["grandpa", "grandma"],
+      "photo": "assets/people/from-reference/child-02.jpg",
       "years": "Name to be added",
-      "note": "Marked as number 2 in the reference photo."
+      "note": "Marked as number 2 in the reference photo. Temporary profile crop from the group photo."
     },
     {
       "id": "child-03",
       "name": "Child 3",
       "order": 3,
       "generation": 2,
-      "parents": ["grandpa"],
-      "photo": "",
+      "parents": ["grandpa", "grandma"],
+      "photo": "assets/people/from-reference/child-03.jpg",
       "years": "Name to be added",
-      "note": "Marked as number 3 in the reference photo."
+      "note": "Marked as number 3 in the reference photo. Temporary profile crop from the group photo."
     },
     {
       "id": "child-04",
       "name": "Child 4",
       "order": 4,
       "generation": 2,
-      "parents": ["grandpa"],
-      "photo": "",
+      "parents": ["grandpa", "grandma"],
+      "photo": "assets/people/from-reference/child-04.jpg",
       "years": "Name to be added",
-      "note": "Marked as number 4 in the reference photo."
+      "note": "Marked as number 4 in the reference photo. Temporary profile crop from the group photo."
     },
     {
       "id": "child-05",
       "name": "Child 5",
       "order": 5,
       "generation": 2,
-      "parents": ["grandpa"],
-      "photo": "",
+      "parents": ["grandpa", "grandma"],
+      "photo": "assets/people/from-reference/child-05.jpg",
       "years": "Name to be added",
-      "note": "Marked as number 5 in the reference photo."
+      "note": "Marked as number 5 in the reference photo. Temporary profile crop from the group photo."
     },
     {
       "id": "child-06",
       "name": "Child 6",
       "order": 6,
       "generation": 2,
-      "parents": ["grandpa"],
-      "photo": "",
+      "parents": ["grandpa", "grandma"],
+      "photo": "assets/people/from-reference/child-06.jpg",
       "years": "Name to be added",
-      "note": "Marked as number 6 in the reference photo."
+      "note": "Marked as number 6 in the reference photo. Temporary profile crop from the group photo."
     },
     {
       "id": "child-07",
       "name": "Child 7",
       "order": 7,
       "generation": 2,
-      "parents": ["grandpa"],
-      "photo": "",
+      "parents": ["grandpa", "grandma"],
+      "photo": "assets/people/from-reference/child-07.jpg",
       "years": "Name to be added",
-      "note": "Marked as number 7 in the reference photo."
+      "note": "Marked as number 7 in the reference photo. Temporary profile crop from the group photo."
     },
     {
       "id": "child-08",
       "name": "Child 8",
       "order": 8,
       "generation": 2,
-      "parents": ["grandpa"],
-      "photo": "",
+      "parents": ["grandpa", "grandma"],
+      "photo": "assets/people/from-reference/child-08.jpg",
       "years": "Name to be added",
-      "note": "Marked as number 8 in the reference photo."
+      "note": "Marked as number 8 in the reference photo. Temporary profile crop from the group photo."
     },
     {
       "id": "child-02-descendant-a",
