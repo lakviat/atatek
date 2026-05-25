@@ -8,7 +8,7 @@
       name="description"
       content="A simple ancestry tree for the Dzhunushaliev family line."
     >
-    <link rel="stylesheet" href="styles.css?v=20260525-mobile-outline">
+    <link rel="stylesheet" href="styles.css?v=20260525-descendancy-mobile">
   </head>
   <body>
     <header class="site-header">
@@ -45,7 +45,19 @@
           <div class="tree-nodes" id="treeNodes"></div>
         </div>
       </section>
-      <section class="mobile-tree-view" id="mobileTreeView" aria-label="Mobile family tree"></section>
+      <section class="mobile-tree-view" aria-label="Mobile family tree">
+        <div class="mobile-tree-toolbar">
+          <button class="mobile-mode-button" type="button">Descendancy</button>
+          <div class="generation-filter" aria-label="Generation depth">
+            <span>Generations:</span>
+            <button type="button" data-depth="1">1</button>
+            <button type="button" data-depth="2">2</button>
+            <button type="button" data-depth="3">3</button>
+            <button type="button" data-depth="4">4</button>
+          </div>
+        </div>
+        <div class="mobile-tree-list" id="mobileTreeView"></div>
+      </section>
     </main>
 
     <dialog class="profile-dialog" id="profileDialog" aria-labelledby="profileName">
@@ -88,6 +100,6 @@
       </figure>
     </dialog>
 
-    <script src="app.js?v=20260525-mobile-outline"></script>
+    <script src="app.js?v=20260525-descendancy-mobile"></script>
   </body>
 </html>

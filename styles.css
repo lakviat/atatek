@@ -619,39 +619,109 @@ h1 {
 
   .mobile-tree-view {
     display: grid;
-    gap: 10px;
+    gap: 0;
     width: 100%;
-    padding: 14px 12px 40px;
-    background:
-      linear-gradient(90deg, rgba(47, 159, 179, 0.08) 0 1px, transparent 1px) 28px 0 / 1px 100% no-repeat,
-      #fff;
+    min-height: calc(100dvh - 76px);
+    background: #f1f2f4;
+  }
+
+  .mobile-tree-toolbar {
+    position: sticky;
+    z-index: 5;
+    top: 76px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-bottom: 1px solid #d7dbe2;
+    background: rgba(241, 242, 244, 0.96);
+    backdrop-filter: blur(10px);
+  }
+
+  .mobile-mode-button,
+  .generation-filter {
+    height: 34px;
+    border: 1px solid #c9ced7;
+    border-radius: 5px;
+    background: linear-gradient(#fff, #e7e9ed);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+  }
+
+  .mobile-mode-button {
+    padding: 0 10px;
+    color: #344054;
+    font-size: 13px;
+    font-weight: 650;
+  }
+
+  .mobile-mode-button::after {
+    margin-left: 6px;
+    content: "▾";
+  }
+
+  .generation-filter {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    padding: 0 5px 0 8px;
+    color: #344054;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .generation-filter span {
+    margin-right: 6px;
+  }
+
+  .generation-filter button {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    color: #344054;
+    font-size: 13px;
+  }
+
+  .generation-filter button.is-active {
+    background: #dceec5;
+    box-shadow: inset 0 0 0 1px #bad59a;
+  }
+
+  .mobile-tree-list {
+    display: grid;
+    gap: 0;
+    padding: 10px 8px 42px;
   }
 
   .mobile-branch {
     position: relative;
     display: grid;
-    gap: 9px;
+    gap: 0;
     min-width: 0;
     margin-left: var(--level-offset);
   }
 
   .mobile-branch::before {
     position: absolute;
-    top: -10px;
-    bottom: -10px;
-    left: -13px;
+    top: -2px;
+    bottom: -2px;
+    left: -14px;
     width: 1px;
-    background: #d1d7df;
+    background: #9299a3;
     content: "";
   }
 
   .mobile-branch::after {
     position: absolute;
-    top: 37px;
-    left: -13px;
-    width: 13px;
+    top: 35px;
+    left: -14px;
+    width: 14px;
     height: 1px;
-    background: #d1d7df;
+    background: #9299a3;
     content: "";
   }
 
@@ -666,24 +736,39 @@ h1 {
 
   .mobile-node-card {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: 22px minmax(0, 1fr) auto;
     align-items: center;
-    gap: 8px;
+    gap: 0;
     min-width: 0;
-    border: 1px solid #e4e9f0;
-    border-radius: 8px;
-    background: #fff;
-    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+    min-height: 76px;
+    background: transparent;
+  }
+
+  .mobile-rail-control {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border: 0;
+    border-radius: 999px;
+    background: #a6acb5;
+    color: #fff;
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .mobile-rail-control.is-empty {
+    background: transparent;
   }
 
   .mobile-person-button {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
-    gap: 10px;
+    gap: 9px;
     min-width: 0;
-    min-height: 78px;
-    padding: 8px 0 8px 9px;
+    min-height: 72px;
+    padding: 7px 0;
     border: 0;
     background: transparent;
     color: inherit;
@@ -701,9 +786,10 @@ h1 {
     width: 58px;
     height: 58px;
     overflow: hidden;
-    border: 3px solid #2f9fb3;
+    border: 3px solid #e7ebf0;
     border-radius: 999px;
-    background: linear-gradient(135deg, #ecfdf5, #f8fafc 52%, #fff7ed);
+    background: linear-gradient(135deg, #f8fafc, #e9edf2);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.16);
   }
 
   .mobile-single-portrait img,
@@ -722,13 +808,13 @@ h1 {
 
   .mobile-couple-portrait {
     display: grid;
-    grid-template-columns: 50px 20px 50px;
+    grid-template-columns: 46px 16px 46px;
     align-items: center;
   }
 
   .mobile-couple-portrait > span:not(.mobile-heart) {
-    width: 50px;
-    height: 50px;
+    width: 46px;
+    height: 46px;
   }
 
   .mobile-heart {
@@ -744,6 +830,9 @@ h1 {
   }
 
   .mobile-person-name {
+    display: flex;
+    align-items: center;
+    gap: 7px;
     overflow: hidden;
     color: #17202a;
     font-size: 14px;
@@ -751,6 +840,19 @@ h1 {
     line-height: 1.2;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .mobile-person-marker {
+    flex: 0 0 auto;
+    width: 7px;
+    height: 7px;
+    border-radius: 2px;
+    background: #2f80d0;
+  }
+
+  .mobile-person-marker.is-couple {
+    border-radius: 999px;
+    background: #d9487d;
   }
 
   .mobile-person-meta {
@@ -764,12 +866,12 @@ h1 {
   }
 
   .mobile-branch-button {
-    min-width: 58px;
-    height: 38px;
-    margin-right: 8px;
-    border: 1px solid #cfd7e2;
+    min-width: 42px;
+    height: 30px;
+    margin-right: 4px;
+    border: 1px solid #c4cad3;
     border-radius: 999px;
-    background: #f8fafc;
+    background: #fff;
     color: #344054;
     font-size: 12px;
     font-weight: 800;
@@ -777,7 +879,7 @@ h1 {
 
   .mobile-children {
     display: grid;
-    gap: 9px;
+    gap: 0;
   }
 
   .tree-controls {

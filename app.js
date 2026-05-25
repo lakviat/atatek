@@ -3,6 +3,7 @@ const state = {
   visiblePeople: [],
   childrenByParent: new Map(),
   collapsedBranches: new Set(),
+  mobileGenerationDepth: 4,
   compact: window.matchMedia("(max-width: 720px)").matches,
   allBranchesExpanded: false,
   scale: 0.88,
@@ -39,7 +40,7 @@ const closeReference = document.querySelector("#closeReference");
 init();
 
 async function init() {
-  const response = await fetch("data/people.json?v=20260525-mobile-outline", { cache: "no-store" });
+  const response = await fetch("data/people.json?v=20260525-descendancy-mobile", { cache: "no-store" });
   const data = await response.json();
   state.people = data.people;
   state.childrenByParent = buildChildrenMap(state.people);
@@ -92,6 +93,7 @@ function renderMobileTree() {
     .filter((person) => !childIds.has(person.id))
     .sort((a, b) => (a.order ?? 999) - (b.order ?? 999) || a.name.localeCompare(b.name));
 
+  updateGenerationDepthControls();
   mobileTreeView.innerHTML = roots.map((root) => mobileNodeMarkup(root, peopleById, 0)).join("");
 
   mobileTreeView.querySelectorAll("[data-profile-id]").forEach((button) => {
@@ -118,23 +120,30 @@ function mobileNodeMarkup(person, peopleById, level) {
   const hasChildren = children.length > 0;
   const isCollapsed = state.collapsedBranches.has(person.id);
   const descendantCount = getDescendantCount(person.id);
-  const visibleChildren = isCollapsed ? [] : children;
-  const levelOffset = Math.min(level * 14, 56);
+  const isDepthLimited = level >= state.mobileGenerationDepth;
+  const visibleChildren = isCollapsed || isDepthLimited ? [] : children;
+  const levelOffset = Math.min(level * 24, 96);
+  const hiddenCount = isDepthLimited && hasChildren ? descendantCount : descendantCount;
 
   return `
     <article class="mobile-branch" style="--level: ${level}; --level-offset: ${levelOffset}px;">
       <div class="mobile-node-card">
+        ${
+          hasChildren
+            ? `<button class="mobile-rail-control" type="button" data-mobile-toggle="${person.id}" aria-label="${isCollapsed || isDepthLimited ? "Expand" : "Collapse"} ${getDisplayName(person)} branch">${isCollapsed || isDepthLimited ? "›" : "⌄"}</button>`
+            : `<span class="mobile-rail-control is-empty"></span>`
+        }
         <button class="mobile-person-button" type="button" data-profile-id="${person.id}">
           <span class="mobile-portrait-wrap">${mobilePortraitMarkup(person)}</span>
           <span class="mobile-person-text">
-            <span class="mobile-person-name">${getDisplayName(person)}</span>
+            <span class="mobile-person-name"><span class="mobile-person-marker ${person.partner ? "is-couple" : ""}"></span>${getDisplayName(person)}</span>
             <span class="mobile-person-meta">${getTimeline(person) || `Generation ${person.generation + 1}`}</span>
           </span>
         </button>
         ${
           hasChildren
             ? `<button class="mobile-branch-button" type="button" data-mobile-toggle="${person.id}" aria-label="${isCollapsed ? "Expand" : "Collapse"} ${getDisplayName(person)} branch">
-                ${isCollapsed ? `+${descendantCount}` : "Less"}
+                ${isCollapsed || isDepthLimited ? `+${hiddenCount}` : "−"}
               </button>`
             : ""
         }
@@ -545,6 +554,12 @@ function bindControls() {
   document.querySelector("[data-action='reset']").addEventListener("click", centerTree);
   document.querySelector("[data-action='toggle-compact']").addEventListener("click", toggleCompactMode);
   document.querySelector("[data-action='toggle-branches']").addEventListener("click", toggleAllBranches);
+  document.querySelectorAll("[data-depth]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.mobileGenerationDepth = Number(button.dataset.depth);
+      renderMobileTree();
+    });
+  });
   closeProfile.addEventListener("click", () => dialog.close());
   openReference.addEventListener("click", () => referenceDialog.showModal());
   closeReference.addEventListener("click", () => referenceDialog.close());
@@ -557,6 +572,12 @@ function bindControls() {
   viewport.addEventListener("gesturestart", preventNativeGesture);
   viewport.addEventListener("gesturechange", preventNativeGesture);
   viewport.addEventListener("gestureend", preventNativeGesture);
+}
+
+function updateGenerationDepthControls() {
+  document.querySelectorAll("[data-depth]").forEach((button) => {
+    button.classList.toggle("is-active", Number(button.dataset.depth) === state.mobileGenerationDepth);
+  });
 }
 
 function toggleCompactMode() {
