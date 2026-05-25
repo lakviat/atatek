@@ -8,7 +8,7 @@
       name="description"
       content="A simple ancestry tree for the Dzhunushaliev family line."
     >
-    <link rel="stylesheet" href="styles.css?v=20260523-branch-split">
+    <link rel="stylesheet" href="styles.css?v=20260525-mobile-branches">
   </head>
   <body>
     <header class="site-header">
@@ -19,6 +19,12 @@
       <div class="tree-controls" aria-label="Tree controls">
         <button class="text-button" type="button" id="openReference">
           Reference
+        </button>
+        <button class="icon-button" type="button" data-action="toggle-compact" aria-label="Toggle compact view">
+          C
+        </button>
+        <button class="icon-button" type="button" data-action="toggle-branches" aria-label="Expand or collapse branches">
+          All
         </button>
         <button class="icon-button" type="button" data-action="zoom-out" aria-label="Zoom out">
           -
@@ -81,6 +87,6 @@
       </figure>
     </dialog>
 
-    <script src="app.js?v=20260523-branch-split"></script>
+    <script src="app.js?v=20260525-mobile-branches"></script>
   </body>
 </html>

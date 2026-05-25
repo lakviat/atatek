@@ -1,5 +1,10 @@
 const state = {
   people: [],
+  visiblePeople: [],
+  childrenByParent: new Map(),
+  collapsedBranches: new Set(),
+  compact: window.matchMedia("(max-width: 720px)").matches,
+  allBranchesExpanded: false,
   scale: 0.88,
   translateX: 80,
   translateY: 72,
@@ -33,28 +38,34 @@ const closeReference = document.querySelector("#closeReference");
 init();
 
 async function init() {
-  const response = await fetch("data/people.json?v=20260523-branch-split", { cache: "no-store" });
+  const response = await fetch("data/people.json?v=20260525-mobile-branches", { cache: "no-store" });
   const data = await response.json();
   state.people = data.people;
+  state.childrenByParent = buildChildrenMap(state.people);
+  applyInitialMobileBranchState();
 
   renderTree();
   bindControls();
   centerTree();
-  window.addEventListener("resize", centerTree);
+  window.addEventListener("resize", onResize);
 }
 
 function renderTree() {
-  const peopleById = new Map(state.people.map((person) => [person.id, person]));
-  assignTreeLayout(state.people);
+  document.body.classList.toggle("is-compact", state.compact);
+  updateControlLabels();
 
-  canvas.style.width = `${Math.max(1200, getMax(state.people, "x") + 260)}px`;
-  canvas.style.height = `${Math.max(780, getMax(state.people, "y") + 220)}px`;
+  state.visiblePeople = getVisiblePeople();
+  const peopleById = new Map(state.visiblePeople.map((person) => [person.id, person]));
+  assignTreeLayout(state.visiblePeople);
+
+  canvas.style.width = `${Math.max(980, getMax(state.visiblePeople, "x") + 260)}px`;
+  canvas.style.height = `${Math.max(680, getMax(state.visiblePeople, "y") + 220)}px`;
   linesLayer.setAttribute("viewBox", `0 0 ${canvas.offsetWidth} ${canvas.offsetHeight}`);
 
   nodesLayer.innerHTML = "";
   linesLayer.innerHTML = "";
 
-  state.people.forEach((person) => {
+  state.visiblePeople.forEach((person) => {
     person.parents.forEach((parentId) => {
       const parent = peopleById.get(parentId);
       if (parent) {
@@ -70,10 +81,10 @@ function assignTreeLayout(people) {
   const childrenByParent = new Map();
   const peopleById = new Map(people.map((person) => [person.id, person]));
   const childIds = new Set();
-  const leafGap = 230;
-  const levelGap = 190;
-  const startX = 150;
-  const startY = 120;
+  const leafGap = state.compact ? 170 : 230;
+  const levelGap = state.compact ? 158 : 190;
+  const startX = state.compact ? 116 : 150;
+  const startY = state.compact ? 102 : 120;
   let cursorX = startX;
 
   people.forEach((person) => {
@@ -167,12 +178,20 @@ function createPersonButton(person) {
   button.style.left = `${person.x}px`;
   button.style.top = `${person.y}px`;
   button.setAttribute("aria-label", `Open profile for ${getDisplayName(person)}`);
+  const childCount = getChildCount(person.id);
   button.innerHTML = `
     ${cardPortraitMarkup(person)}
     ${person.order ? `<span class="order-badge" aria-label="Marked order ${person.order}">${person.order}</span>` : ""}
+    ${childCount ? branchToggleMarkup(person, childCount) : ""}
     <span class="person-name">${getDisplayName(person)}</span>
     <span class="person-meta">${getTimeline(person) || `Generation ${person.generation + 1}`}</span>
   `;
+  const branchToggle = button.querySelector(".branch-toggle");
+  branchToggle?.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    toggleBranch(person.id);
+  });
   button.addEventListener("click", (event) => {
     if (state.suppressClick) {
       event.preventDefault();
@@ -182,6 +201,24 @@ function createPersonButton(person) {
     openProfile(person);
   });
   return button;
+}
+
+function branchToggleMarkup(person, childCount) {
+  const isCollapsed = state.collapsedBranches.has(person.id);
+  const hiddenCount = isCollapsed ? getDescendantCount(person.id) : childCount;
+  const label = isCollapsed ? `Expand ${hiddenCount} descendants` : `Collapse ${childCount} children`;
+
+  return `
+    <span
+      class="branch-toggle ${isCollapsed ? "is-collapsed" : ""}"
+      role="button"
+      tabindex="0"
+      aria-label="${label}"
+      title="${label}"
+    >
+      ${isCollapsed ? `+${hiddenCount}` : "−"}
+    </span>
+  `;
 }
 
 function cardPortraitMarkup(person) {
@@ -208,7 +245,7 @@ function cardPortraitMarkup(person) {
 
 function portraitMarkup(person) {
   if (person.photo) {
-    return `<img src="${person.photo}" alt="${person.name}">`;
+    return `<img src="${person.photo}" alt="${person.name}" loading="lazy" decoding="async">`;
   }
 
   return `<span class="portrait-placeholder" aria-hidden="true">${getInitials(person.name)}</span>`;
@@ -246,6 +283,109 @@ function profilePhotoMarkup(person) {
       </figure>
     </div>
   `;
+}
+
+function buildChildrenMap(people) {
+  const peopleById = new Map(people.map((person) => [person.id, person]));
+  const map = new Map();
+
+  people.forEach((person) => {
+    const primaryParentId = person.parents?.[0];
+
+    if (!primaryParentId || !peopleById.has(primaryParentId)) {
+      return;
+    }
+
+    if (!map.has(primaryParentId)) {
+      map.set(primaryParentId, []);
+    }
+
+    map.get(primaryParentId).push(person.id);
+  });
+
+  map.forEach((children) => {
+    children.sort((firstId, secondId) => {
+      const first = peopleById.get(firstId);
+      const second = peopleById.get(secondId);
+      return (first.order ?? 999) - (second.order ?? 999) || first.name.localeCompare(second.name);
+    });
+  });
+
+  return map;
+}
+
+function applyInitialMobileBranchState() {
+  if (!state.compact) {
+    return;
+  }
+
+  state.people.forEach((person) => {
+    if (person.generation >= 3 && getChildCount(person.id)) {
+      state.collapsedBranches.add(person.id);
+    }
+  });
+}
+
+function getVisiblePeople() {
+  const hiddenIds = new Set();
+
+  state.collapsedBranches.forEach((personId) => {
+    collectDescendantIds(personId, hiddenIds);
+  });
+
+  return state.people.filter((person) => !hiddenIds.has(person.id));
+}
+
+function collectDescendantIds(personId, result) {
+  const children = state.childrenByParent.get(personId) ?? [];
+
+  children.forEach((childId) => {
+    result.add(childId);
+    collectDescendantIds(childId, result);
+  });
+}
+
+function getChildCount(personId) {
+  return state.childrenByParent.get(personId)?.length ?? 0;
+}
+
+function getDescendantCount(personId) {
+  const descendants = new Set();
+  collectDescendantIds(personId, descendants);
+  return descendants.size;
+}
+
+function toggleBranch(personId) {
+  if (state.collapsedBranches.has(personId)) {
+    state.collapsedBranches.delete(personId);
+  } else {
+    state.collapsedBranches.add(personId);
+  }
+
+  state.allBranchesExpanded = state.collapsedBranches.size === 0;
+  renderTree();
+  centerTree();
+}
+
+function expandAllBranches() {
+  state.collapsedBranches.clear();
+  state.allBranchesExpanded = true;
+  renderTree();
+  centerTree();
+}
+
+function collapseDeepBranches() {
+  state.collapsedBranches.clear();
+
+  state.people.forEach((person) => {
+    if (person.generation >= 2 && getChildCount(person.id)) {
+      state.collapsedBranches.add(person.id);
+    }
+  });
+
+  state.allBranchesExpanded = false;
+  renderTree();
+  centerTree();
 }
 
 function profileFactsMarkup(person) {
@@ -292,6 +432,8 @@ function bindControls() {
   document.querySelector("[data-action='zoom-in']").addEventListener("click", () => zoomBy(1.16));
   document.querySelector("[data-action='zoom-out']").addEventListener("click", () => zoomBy(0.86));
   document.querySelector("[data-action='reset']").addEventListener("click", centerTree);
+  document.querySelector("[data-action='toggle-compact']").addEventListener("click", toggleCompactMode);
+  document.querySelector("[data-action='toggle-branches']").addEventListener("click", toggleAllBranches);
   closeProfile.addEventListener("click", () => dialog.close());
   openReference.addEventListener("click", () => referenceDialog.showModal());
   closeReference.addEventListener("click", () => referenceDialog.close());
@@ -304,6 +446,46 @@ function bindControls() {
   viewport.addEventListener("gesturestart", preventNativeGesture);
   viewport.addEventListener("gesturechange", preventNativeGesture);
   viewport.addEventListener("gestureend", preventNativeGesture);
+}
+
+function toggleCompactMode() {
+  state.compact = !state.compact;
+  renderTree();
+  centerTree();
+}
+
+function toggleAllBranches() {
+  if (state.allBranchesExpanded || state.collapsedBranches.size === 0) {
+    collapseDeepBranches();
+    return;
+  }
+
+  expandAllBranches();
+}
+
+function updateControlLabels() {
+  const compactButton = document.querySelector("[data-action='toggle-compact']");
+  const branchesButton = document.querySelector("[data-action='toggle-branches']");
+
+  compactButton.textContent = state.compact ? "Full" : "C";
+  compactButton.setAttribute("aria-label", state.compact ? "Switch to full-size view" : "Switch to compact view");
+
+  branchesButton.textContent = state.collapsedBranches.size ? "All" : "Less";
+  branchesButton.setAttribute(
+    "aria-label",
+    state.collapsedBranches.size ? "Expand all branches" : "Collapse deeper branches"
+  );
+}
+
+function onResize() {
+  const shouldCompact = window.matchMedia("(max-width: 720px)").matches;
+
+  if (shouldCompact !== state.compact) {
+    state.compact = shouldCompact;
+    renderTree();
+  }
+
+  centerTree();
 }
 
 function onWheel(event) {

@@ -66,6 +66,13 @@ These are only draft portraits and can be replaced later with cleaner individual
 
 Large branches are laid out by subtree size. A person or couple with many descendants gets more horizontal space, while branches with no children stay compact.
 
+Mobile-first behavior:
+
+- The tree starts in compact mode on small screens.
+- Deeper branches can be collapsed so the full family remains navigable as the tree grows.
+- Branch badges show how many hidden descendants are inside a collapsed branch.
+- Photos lazy-load so large trees do not force every portrait to load immediately.
+
 Family-of-origin and marriage branches are separate visually:
 
 - Parent/sibling lines connect to the individual person's portrait.
