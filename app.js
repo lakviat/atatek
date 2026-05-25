@@ -29,6 +29,7 @@ const viewport = document.querySelector("#treeViewport");
 const canvas = document.querySelector("#treeCanvas");
 const nodesLayer = document.querySelector("#treeNodes");
 const linesLayer = document.querySelector("#treeLines");
+const mobileTreeView = document.querySelector("#mobileTreeView");
 const dialog = document.querySelector("#profileDialog");
 const closeProfile = document.querySelector("#closeProfile");
 const referenceDialog = document.querySelector("#referenceDialog");
@@ -38,10 +39,11 @@ const closeReference = document.querySelector("#closeReference");
 init();
 
 async function init() {
-  const response = await fetch("data/people.json?v=20260525-mobile-branches", { cache: "no-store" });
+  const response = await fetch("data/people.json?v=20260525-mobile-outline", { cache: "no-store" });
   const data = await response.json();
   state.people = data.people;
   state.childrenByParent = buildChildrenMap(state.people);
+  normalizeGenerations(state.people);
   applyInitialMobileBranchState();
 
   renderTree();
@@ -53,6 +55,7 @@ async function init() {
 function renderTree() {
   document.body.classList.toggle("is-compact", state.compact);
   updateControlLabels();
+  renderMobileTree();
 
   state.visiblePeople = getVisiblePeople();
   const peopleById = new Map(state.visiblePeople.map((person) => [person.id, person]));
@@ -75,6 +78,88 @@ function renderTree() {
 
     nodesLayer.appendChild(createPersonButton(person));
   });
+}
+
+function renderMobileTree() {
+  const peopleById = new Map(state.people.map((person) => [person.id, person]));
+  const childIds = new Set();
+
+  state.childrenByParent.forEach((children) => {
+    children.forEach((childId) => childIds.add(childId));
+  });
+
+  const roots = state.people
+    .filter((person) => !childIds.has(person.id))
+    .sort((a, b) => (a.order ?? 999) - (b.order ?? 999) || a.name.localeCompare(b.name));
+
+  mobileTreeView.innerHTML = roots.map((root) => mobileNodeMarkup(root, peopleById, 0)).join("");
+
+  mobileTreeView.querySelectorAll("[data-profile-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const person = peopleById.get(button.dataset.profileId);
+      if (person) {
+        openProfile(person);
+      }
+    });
+  });
+
+  mobileTreeView.querySelectorAll("[data-mobile-toggle]").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleBranch(button.dataset.mobileToggle);
+    });
+  });
+}
+
+function mobileNodeMarkup(person, peopleById, level) {
+  const children = (state.childrenByParent.get(person.id) ?? [])
+    .map((childId) => peopleById.get(childId))
+    .filter(Boolean);
+  const hasChildren = children.length > 0;
+  const isCollapsed = state.collapsedBranches.has(person.id);
+  const descendantCount = getDescendantCount(person.id);
+  const visibleChildren = isCollapsed ? [] : children;
+  const levelOffset = Math.min(level * 14, 56);
+
+  return `
+    <article class="mobile-branch" style="--level: ${level}; --level-offset: ${levelOffset}px;">
+      <div class="mobile-node-card">
+        <button class="mobile-person-button" type="button" data-profile-id="${person.id}">
+          <span class="mobile-portrait-wrap">${mobilePortraitMarkup(person)}</span>
+          <span class="mobile-person-text">
+            <span class="mobile-person-name">${getDisplayName(person)}</span>
+            <span class="mobile-person-meta">${getTimeline(person) || `Generation ${person.generation + 1}`}</span>
+          </span>
+        </button>
+        ${
+          hasChildren
+            ? `<button class="mobile-branch-button" type="button" data-mobile-toggle="${person.id}" aria-label="${isCollapsed ? "Expand" : "Collapse"} ${getDisplayName(person)} branch">
+                ${isCollapsed ? `+${descendantCount}` : "Less"}
+              </button>`
+            : ""
+        }
+      </div>
+      ${
+        visibleChildren.length
+          ? `<div class="mobile-children">${visibleChildren.map((child) => mobileNodeMarkup(child, peopleById, level + 1)).join("")}</div>`
+          : ""
+      }
+    </article>
+  `;
+}
+
+function mobilePortraitMarkup(person) {
+  if (!person.partner) {
+    return `<span class="mobile-single-portrait">${portraitMarkup(person)}</span>`;
+  }
+
+  return `
+    <span class="mobile-couple-portrait">
+      <span>${portraitMarkup(person)}</span>
+      <span class="mobile-heart">♥</span>
+      <span>${portraitMarkup(person.partner)}</span>
+    </span>
+  `;
 }
 
 function assignTreeLayout(people) {
@@ -312,6 +397,32 @@ function buildChildrenMap(people) {
   });
 
   return map;
+}
+
+function normalizeGenerations(people) {
+  const peopleById = new Map(people.map((person) => [person.id, person]));
+  const visiting = new Set();
+
+  people.forEach((person) => assignGeneration(person));
+
+  function assignGeneration(person) {
+    if (!person.parents?.length) {
+      person.generation = 0;
+      return person.generation;
+    }
+
+    if (visiting.has(person.id)) {
+      return person.generation ?? 0;
+    }
+
+    visiting.add(person.id);
+    person.generation = Math.max(...person.parents.map((parentId) => {
+      const parent = peopleById.get(parentId);
+      return parent ? assignGeneration(parent) : -1;
+    })) + 1;
+    visiting.delete(person.id);
+    return person.generation;
+  }
 }
 
 function applyInitialMobileBranchState() {

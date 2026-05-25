@@ -68,7 +68,8 @@ Large branches are laid out by subtree size. A person or couple with many descen
 
 Mobile-first behavior:
 
-- The tree starts in compact mode on small screens.
+- Small screens use a separate vertical outline view instead of the desktop canvas.
+- The mobile outline fits the phone width and avoids horizontal panning.
 - Deeper branches can be collapsed so the full family remains navigable as the tree grows.
 - Branch badges show how many hidden descendants are inside a collapsed branch.
 - Photos lazy-load so large trees do not force every portrait to load immediately.
