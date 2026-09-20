@@ -1,9 +1,13 @@
+const PRIMARY_LINEAGE_ROOT_ID = "grandpa-grandmother-family";
+
 const state = {
   people: [],
   visiblePeople: [],
   childrenByParent: new Map(),
+  lineageByPerson: new Map(),
+  lineageAnchors: [],
   collapsedBranches: new Set(),
-  mobileGenerationDepth: 3,
+  mobileGenerationDepth: 4,
   compact: window.matchMedia("(max-width: 720px)").matches,
   allBranchesExpanded: false,
   scale: 0.88,
@@ -31,6 +35,8 @@ const canvas = document.querySelector("#treeCanvas");
 const nodesLayer = document.querySelector("#treeNodes");
 const linesLayer = document.querySelector("#treeLines");
 const mobileTreeView = document.querySelector("#mobileTreeView");
+const desktopLineageKey = document.querySelector("#desktopLineageKey");
+const mobileLineageKey = document.querySelector("#mobileLineageKey");
 const dialog = document.querySelector("#profileDialog");
 const closeProfile = document.querySelector("#closeProfile");
 const referenceDialog = document.querySelector("#referenceDialog");
@@ -40,11 +46,13 @@ const closeReference = document.querySelector("#closeReference");
 init();
 
 async function init() {
-  const response = await fetch("data/people.json?v=20260920-mobile-tree", { cache: "no-store" });
+  const response = await fetch("data/people.json?v=20260920-lineage", { cache: "no-store" });
   const data = await response.json();
   state.people = data.people;
   state.childrenByParent = buildChildrenMap(state.people);
   normalizeGenerations(state.people);
+  buildLineageIndex();
+  renderLineageKeys();
   renderTree();
   bindControls();
   centerTree();
@@ -135,9 +143,11 @@ function mobileNodeMarkup(person, peopleById, level) {
   const hiddenCount = descendantCount;
   const isOpen = hasChildren && !isCollapsed && !isDepthLimited;
   const generationClass = `generation-${Math.min(level + 1, 5)}`;
+  const lineage = getLineageMeta(person.id);
+  const lineageClass = lineage?.className ?? "";
 
   return `
-    <article class="mobile-branch ${generationClass}" data-level="${level}">
+    <article class="mobile-branch ${generationClass}${lineage ? ` has-lineage ${lineageClass}` : ""}" data-level="${level}">
       <div class="mobile-node-card">
         <button class="mobile-person-button" type="button" data-profile-id="${person.id}" aria-label="Open profile for ${getDisplayName(person)}">
           <span class="mobile-portrait-wrap">${mobilePortraitMarkup(person)}</span>
@@ -145,6 +155,7 @@ function mobileNodeMarkup(person, peopleById, level) {
             <span class="mobile-generation-label">Generation ${level + 1}${person.order ? ` · Child ${person.order}` : ""}</span>
             <span class="mobile-person-name">${getDisplayName(person)}</span>
             <span class="mobile-person-meta">${getTimeline(person) || `Generation ${person.generation + 1}`}</span>
+            ${lineage ? `<span class="mobile-lineage-label"><span aria-hidden="true"></span>Family line: ${lineage.anchorName}</span>` : ""}
           </span>
         </button>
         ${
@@ -260,6 +271,11 @@ function createLine(parent, child) {
     `M ${start.x} ${start.y} L ${start.x} ${midpointY} L ${end.x} ${midpointY} L ${end.x} ${end.y}`
   );
 
+  const lineage = getLineageMeta(child.id);
+  if (lineage) {
+    path.classList.add("has-lineage", lineage.className);
+  }
+
   return path;
 }
 
@@ -283,7 +299,8 @@ function getPersonAnchorOffset(person) {
 
 function createPersonButton(person) {
   const button = document.createElement("button");
-  button.className = `person-card${person.partner ? " has-partner" : ""}`;
+  const lineage = getLineageMeta(person.id);
+  button.className = `person-card${person.partner ? " has-partner" : ""}${lineage ? ` has-lineage ${lineage.className}` : ""}`;
   button.type = "button";
   button.style.left = `${person.x}px`;
   button.style.top = `${person.y}px`;
@@ -295,6 +312,7 @@ function createPersonButton(person) {
     ${childCount ? branchToggleMarkup(person, childCount) : ""}
     <span class="person-name">${getDisplayName(person)}</span>
     <span class="person-meta">${getTimeline(person) || `Generation ${person.generation + 1}`}</span>
+    ${lineage ? `<span class="person-lineage"><span aria-hidden="true"></span>${lineage.anchorName} line</span>` : ""}
   `;
   const branchToggle = button.querySelector(".branch-toggle");
   branchToggle?.addEventListener("click", (event) => {
@@ -450,6 +468,79 @@ function normalizeGenerations(people) {
   }
 }
 
+function buildLineageIndex() {
+  const peopleById = new Map(state.people.map((person) => [person.id, person]));
+  const preferredAnchorIds = state.childrenByParent.get(PRIMARY_LINEAGE_ROOT_ID);
+  const lineageRoot = preferredAnchorIds?.length
+    ? [PRIMARY_LINEAGE_ROOT_ID, preferredAnchorIds]
+    : [...state.childrenByParent.entries()]
+      .filter(([, children]) => children.length > 1)
+      .sort((first, second) => second[1].length - first[1].length)[0];
+
+  state.lineageByPerson.clear();
+  state.lineageAnchors = [];
+
+  if (!lineageRoot) {
+    return;
+  }
+
+  const [, anchorIds] = lineageRoot;
+  state.lineageAnchors = anchorIds
+    .map((anchorId, index) => {
+      const anchor = peopleById.get(anchorId);
+      if (!anchor) {
+        return null;
+      }
+
+      return {
+        anchorId,
+        anchorName: anchor.name,
+        className: `lineage-${(index % 8) + 1}`
+      };
+    })
+    .filter(Boolean);
+
+  state.lineageAnchors.forEach((lineage) => assignLineage(lineage.anchorId, lineage));
+
+  function assignLineage(personId, lineage) {
+    state.lineageByPerson.set(personId, lineage);
+    (state.childrenByParent.get(personId) ?? []).forEach((childId) => assignLineage(childId, lineage));
+  }
+}
+
+function renderLineageKeys() {
+  if (!state.lineageAnchors.length) {
+    desktopLineageKey.hidden = true;
+    mobileLineageKey.hidden = true;
+    return;
+  }
+
+  const keyItems = state.lineageAnchors
+    .map((lineage) => `
+      <li class="lineage-key-item ${lineage.className}">
+        <span class="lineage-key-swatch" aria-hidden="true"></span>
+        <span>${lineage.anchorName}</span>
+      </li>
+    `)
+    .join("");
+  const keyMarkup = `
+    <div class="lineage-key-heading">
+      <strong>Family lines</strong>
+      <span>Each color follows one child and every descendant.</span>
+    </div>
+    <ul class="lineage-key-list">${keyItems}</ul>
+  `;
+
+  desktopLineageKey.innerHTML = keyMarkup;
+  mobileLineageKey.innerHTML = keyMarkup;
+  desktopLineageKey.hidden = false;
+  mobileLineageKey.hidden = false;
+}
+
+function getLineageMeta(personId) {
+  return state.lineageByPerson.get(personId) ?? null;
+}
+
 function getVisiblePeople() {
   const hiddenIds = new Set();
 
@@ -515,7 +606,9 @@ function collapseDeepBranches() {
 }
 
 function profileFactsMarkup(person) {
+  const lineage = getLineageMeta(person.id);
   const facts = [
+    ...(lineage ? [["Family line", `${lineage.anchorName} and descendants`]] : []),
     ["Birth", formatDateValue(person.birthDate, person.birthDateLabel || "To be added")],
     ["Death", formatDateValue(person.deathDate, person.deathDateLabel || "To be added")],
     ["Age", person.ageAtDeath ? `${person.ageAtDeath}` : "To be added"]

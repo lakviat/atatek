@@ -8,7 +8,7 @@
       name="description"
       content="A simple ancestry tree for the Dzhunushaliev family line."
     >
-    <link rel="stylesheet" href="styles.css?v=20260920-mobile-tree">
+    <link rel="stylesheet" href="styles.css?v=20260920-lineage">
   </head>
   <body>
     <header class="site-header">
@@ -45,6 +45,7 @@
           <div class="tree-nodes" id="treeNodes"></div>
         </div>
       </section>
+      <aside class="desktop-lineage-key" id="desktopLineageKey" aria-label="Family branch colors"></aside>
       <section class="mobile-tree-view" aria-label="Mobile family tree">
         <div class="mobile-tree-intro">
           <div>
@@ -64,9 +65,11 @@
             <button type="button" data-depth="2">2</button>
             <button type="button" data-depth="3">3</button>
             <button type="button" data-depth="4">4</button>
+            <button type="button" data-depth="5">5</button>
             <button type="button" data-depth="all">All</button>
           </div>
         </div>
+        <div class="mobile-lineage-key" id="mobileLineageKey" aria-label="Family branch colors"></div>
         <div class="mobile-tree-list" id="mobileTreeView"></div>
       </section>
     </main>
@@ -111,6 +114,6 @@
       </figure>
     </dialog>
 
-    <script src="app.js?v=20260920-mobile-tree"></script>
+    <script src="app.js?v=20260920-lineage"></script>
   </body>
 </html>

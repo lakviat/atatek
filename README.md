@@ -54,6 +54,8 @@ Original uploaded photos are preserved in:
 
 `assets/uploads/originals/`
 
+Keep these originals intact. The website uses separate web-ready crops under `assets/people/`, so a displayed portrait can be improved without overwriting the collected source photo.
+
 Cleaned or cropped web-ready profile photos are stored separately in:
 
 `assets/people/`
@@ -72,6 +74,8 @@ Mobile-first behavior:
 
 - Small screens use a separate vertical outline view instead of the desktop canvas.
 - The mobile outline fits the phone width and avoids horizontal panning.
+- Every child receives a distinct family-line color that stays consistent for all grandchildren and later descendants.
+- Branch labels, the family-line key, and profile details identify which child each descendant comes from.
 - Deeper branches can be collapsed so the full family remains navigable as the tree grows.
 - Branch badges show how many hidden descendants are inside a collapsed branch.
 - Photos lazy-load so large trees do not force every portrait to load immediately.

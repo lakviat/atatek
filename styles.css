@@ -10,6 +10,46 @@
   --shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
 }
 
+.lineage-1 {
+  --lineage-color: #15756a;
+  --lineage-tint: #e5f4f1;
+}
+
+.lineage-2 {
+  --lineage-color: #276fad;
+  --lineage-tint: #e7f1fa;
+}
+
+.lineage-3 {
+  --lineage-color: #ad681f;
+  --lineage-tint: #fbefdf;
+}
+
+.lineage-4 {
+  --lineage-color: #7654a4;
+  --lineage-tint: #f0eaf7;
+}
+
+.lineage-5 {
+  --lineage-color: #af4964;
+  --lineage-tint: #f9e8ed;
+}
+
+.lineage-6 {
+  --lineage-color: #4f7734;
+  --lineage-tint: #edf4e7;
+}
+
+.lineage-7 {
+  --lineage-color: #4e5ca7;
+  --lineage-tint: #eaecf8;
+}
+
+.lineage-8 {
+  --lineage-color: #a84f35;
+  --lineage-tint: #faebe6;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -103,12 +143,17 @@ h1 {
 }
 
 .tree-shell {
+  position: relative;
   height: 100vh;
   height: 100dvh;
   padding-top: 84px;
 }
 
 .mobile-tree-view {
+  display: none;
+}
+
+.mobile-lineage-key {
   display: none;
 }
 
@@ -148,6 +193,12 @@ h1 {
   stroke-width: 2;
   stroke-linecap: square;
   stroke-linejoin: round;
+}
+
+.tree-lines path.has-lineage {
+  stroke: var(--lineage-color);
+  stroke-width: 2.6;
+  opacity: 0.72;
 }
 
 .tree-nodes {
@@ -197,6 +248,21 @@ h1 {
 
 .person-card.has-partner {
   width: 300px;
+}
+
+.person-card.has-lineage .portrait {
+  border-color: var(--lineage-color);
+}
+
+.person-card.has-lineage .couple-link::before,
+.person-card.has-lineage .couple-link::after {
+  background: var(--lineage-color);
+  opacity: 0.72;
+}
+
+.person-card.has-lineage .order-badge,
+.person-card.has-lineage .branch-toggle {
+  background: var(--lineage-color);
 }
 
 .person-card:focus-visible .portrait {
@@ -273,7 +339,7 @@ h1 {
   width: 88px;
   height: 88px;
   overflow: hidden;
-  border: 4px solid #2f9fb3;
+  border: 4px solid #71827e;
   border-radius: 999px;
   background: linear-gradient(135deg, #ecfdf5, #f1f5f9 52%, #fff7ed);
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.11);
@@ -332,6 +398,93 @@ h1 {
   font-size: 12px;
   line-height: 1.2;
   text-align: center;
+}
+
+.person-lineage {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+  color: var(--lineage-color);
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.person-lineage > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.desktop-lineage-key {
+  position: absolute;
+  z-index: 6;
+  bottom: 18px;
+  left: 18px;
+  width: min(340px, calc(100vw - 36px));
+  padding: 14px;
+  border: 1px solid #dfe5e2;
+  border-radius: 16px;
+  background: rgba(255, 255, 252, 0.94);
+  box-shadow: 0 12px 34px rgba(23, 56, 52, 0.11);
+  backdrop-filter: blur(12px);
+}
+
+.desktop-lineage-key[hidden],
+.mobile-lineage-key[hidden] {
+  display: none;
+}
+
+.lineage-key-heading {
+  display: grid;
+  gap: 2px;
+}
+
+.lineage-key-heading strong {
+  color: #23423e;
+  font-size: 13px;
+}
+
+.lineage-key-heading > span {
+  color: #6b7774;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.lineage-key-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px 8px;
+  margin: 11px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lineage-key-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: #40514d;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.lineage-key-item > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lineage-key-swatch {
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--lineage-color);
+  box-shadow: 0 0 0 3px var(--lineage-tint);
 }
 
 .is-compact .tree-lines path {
@@ -747,6 +900,62 @@ h1 {
     background: rgba(245, 246, 242, 0.94);
   }
 
+  .desktop-lineage-key {
+    display: none;
+  }
+
+  .mobile-lineage-key {
+    display: grid;
+    gap: 9px;
+    padding: 12px;
+    border-bottom: 1px solid rgba(34, 75, 71, 0.1);
+    background: #fffef9;
+  }
+
+  .mobile-lineage-key .lineage-key-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .mobile-lineage-key .lineage-key-heading strong {
+    flex: 0 0 auto;
+    font-size: 13px;
+  }
+
+  .mobile-lineage-key .lineage-key-heading > span {
+    font-size: 12px;
+    text-align: right;
+  }
+
+  .mobile-lineage-key .lineage-key-list {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    padding: 2px 2px 5px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-lineage-key .lineage-key-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-lineage-key .lineage-key-item {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    min-height: 34px;
+    padding: 7px 10px;
+    border: 1px solid color-mix(in srgb, var(--lineage-color) 25%, white);
+    border-radius: 999px;
+    background: var(--lineage-tint);
+    color: #344b47;
+    font-size: 12px;
+  }
+
   .mobile-mode-label {
     color: #49605c;
     font-size: 11px;
@@ -815,29 +1024,18 @@ h1 {
     margin-left: 14px;
   }
 
-  .mobile-branch.generation-1 {
-    --branch-color: #245d57;
-    --branch-tint: #e4f1ee;
-  }
-
-  .mobile-branch.generation-2 {
-    --branch-color: #2c72a8;
-    --branch-tint: #e8f2fa;
-  }
-
-  .mobile-branch.generation-3 {
-    --branch-color: #b6752b;
-    --branch-tint: #fbf1e3;
-  }
-
-  .mobile-branch.generation-4 {
-    --branch-color: #8a5a9f;
-    --branch-tint: #f3ebf6;
-  }
-
+  .mobile-branch.generation-1,
+  .mobile-branch.generation-2,
+  .mobile-branch.generation-3,
+  .mobile-branch.generation-4,
   .mobile-branch.generation-5 {
-    --branch-color: #a54f65;
-    --branch-tint: #faeaf0;
+    --branch-color: #65716e;
+    --branch-tint: #eef1f0;
+  }
+
+  .mobile-branch.has-lineage {
+    --branch-color: var(--lineage-color);
+    --branch-tint: var(--lineage-tint);
   }
 
   .mobile-branch::before {
@@ -984,7 +1182,7 @@ h1 {
 
   .mobile-generation-label {
     color: var(--branch-color);
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 850;
     letter-spacing: 0.07em;
     line-height: 1.2;
@@ -1006,7 +1204,29 @@ h1 {
   .mobile-person-meta {
     margin-top: 1px;
     color: #75807c;
-    font-size: 10px;
+    font-size: 11px;
+  }
+
+  .mobile-lineage-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    width: fit-content;
+    margin-top: 3px;
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: var(--branch-tint);
+    color: var(--branch-color);
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .mobile-lineage-label > span {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: currentColor;
   }
 
   .mobile-branch-button {
