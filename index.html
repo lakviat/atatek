@@ -8,7 +8,7 @@
       name="description"
       content="A simple ancestry tree for the Dzhunushaliev family line."
     >
-    <link rel="stylesheet" href="styles.css?v=20260525-descendancy-mobile">
+    <link rel="stylesheet" href="styles.css?v=20260920-mobile-tree">
   </head>
   <body>
     <header class="site-header">
@@ -46,14 +46,25 @@
         </div>
       </section>
       <section class="mobile-tree-view" aria-label="Mobile family tree">
+        <div class="mobile-tree-intro">
+          <div>
+            <p class="mobile-tree-kicker">Family archive</p>
+            <h2>Explore the family line</h2>
+            <p>Tap a portrait for details. Open a branch to continue through each generation.</p>
+          </div>
+          <div class="mobile-tree-stats" aria-label="Family tree summary">
+            <span><strong id="mobilePeopleCount">0</strong> people</span>
+            <span><strong id="mobileGenerationCount">0</strong> generations</span>
+          </div>
+        </div>
         <div class="mobile-tree-toolbar">
-          <button class="mobile-mode-button" type="button">Descendancy</button>
-          <div class="generation-filter" aria-label="Generation depth">
-            <span>Generations:</span>
-            <button type="button" data-depth="1">1</button>
+          <span class="mobile-mode-label">Tree view</span>
+          <div class="generation-filter" role="group" aria-label="Generation depth">
+            <span>Show</span>
             <button type="button" data-depth="2">2</button>
             <button type="button" data-depth="3">3</button>
             <button type="button" data-depth="4">4</button>
+            <button type="button" data-depth="all">All</button>
           </div>
         </div>
         <div class="mobile-tree-list" id="mobileTreeView"></div>
@@ -100,6 +111,6 @@
       </figure>
     </dialog>
 
-    <script src="app.js?v=20260525-descendancy-mobile"></script>
+    <script src="app.js?v=20260920-mobile-tree"></script>
   </body>
 </html>

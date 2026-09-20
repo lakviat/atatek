@@ -2,6 +2,10 @@
 
 Atatek is a simple family ancestry tree website for the Dzhunushaliev Family Line.
 
+## Live Website
+
+[View the Atatek family tree on GitHub Pages](https://lakviat.github.io/atatek/)
+
 The first version is a static GitHub Pages-ready site with:
 
 - A clean white-background family tree
@@ -28,9 +32,7 @@ Enable Pages in the repository settings:
 - Branch: `main`
 - Folder: `/root`
 
-After GitHub finishes publishing, the site should be available at:
-
-`https://lakviat.github.io/atatek/`
+The published site is available at [https://lakviat.github.io/atatek/](https://lakviat.github.io/atatek/).
 
 ## Editing People
 

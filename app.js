@@ -3,7 +3,7 @@ const state = {
   visiblePeople: [],
   childrenByParent: new Map(),
   collapsedBranches: new Set(),
-  mobileGenerationDepth: 4,
+  mobileGenerationDepth: 3,
   compact: window.matchMedia("(max-width: 720px)").matches,
   allBranchesExpanded: false,
   scale: 0.88,
@@ -40,13 +40,11 @@ const closeReference = document.querySelector("#closeReference");
 init();
 
 async function init() {
-  const response = await fetch("data/people.json?v=20260525-descendancy-mobile", { cache: "no-store" });
+  const response = await fetch("data/people.json?v=20260920-mobile-tree", { cache: "no-store" });
   const data = await response.json();
   state.people = data.people;
   state.childrenByParent = buildChildrenMap(state.people);
   normalizeGenerations(state.people);
-  applyInitialMobileBranchState();
-
   renderTree();
   bindControls();
   centerTree();
@@ -84,6 +82,7 @@ function renderTree() {
 function renderMobileTree() {
   const peopleById = new Map(state.people.map((person) => [person.id, person]));
   const childIds = new Set();
+  const generationCount = getMobileGenerationCount();
 
   state.childrenByParent.forEach((children) => {
     children.forEach((childId) => childIds.add(childId));
@@ -93,6 +92,8 @@ function renderMobileTree() {
     .filter((person) => !childIds.has(person.id))
     .sort((a, b) => (a.order ?? 999) - (b.order ?? 999) || a.name.localeCompare(b.name));
 
+  document.querySelector("#mobilePeopleCount").textContent = state.people.length;
+  document.querySelector("#mobileGenerationCount").textContent = generationCount;
   updateGenerationDepthControls();
   mobileTreeView.innerHTML = roots.map((root) => mobileNodeMarkup(root, peopleById, 0)).join("");
 
@@ -108,6 +109,15 @@ function renderMobileTree() {
   mobileTreeView.querySelectorAll("[data-mobile-toggle]").forEach((button) => {
     button.addEventListener("click", (event) => {
       event.stopPropagation();
+
+      if (button.dataset.depthLimited === "true") {
+        const nextDepth = Math.min(generationCount, Number(button.dataset.level) + 2);
+        state.mobileGenerationDepth = Math.max(state.mobileGenerationDepth, nextDepth);
+        state.collapsedBranches.delete(button.dataset.mobileToggle);
+        renderMobileTree();
+        return;
+      }
+
       toggleBranch(button.dataset.mobileToggle);
     });
   });
@@ -120,30 +130,36 @@ function mobileNodeMarkup(person, peopleById, level) {
   const hasChildren = children.length > 0;
   const isCollapsed = state.collapsedBranches.has(person.id);
   const descendantCount = getDescendantCount(person.id);
-  const isDepthLimited = level >= state.mobileGenerationDepth;
+  const isDepthLimited = level + 1 >= state.mobileGenerationDepth;
   const visibleChildren = isCollapsed || isDepthLimited ? [] : children;
-  const levelOffset = Math.min(level * 24, 96);
-  const hiddenCount = isDepthLimited && hasChildren ? descendantCount : descendantCount;
+  const hiddenCount = descendantCount;
+  const isOpen = hasChildren && !isCollapsed && !isDepthLimited;
+  const generationClass = `generation-${Math.min(level + 1, 5)}`;
 
   return `
-    <article class="mobile-branch" style="--level: ${level}; --level-offset: ${levelOffset}px;">
+    <article class="mobile-branch ${generationClass}" data-level="${level}">
       <div class="mobile-node-card">
-        ${
-          hasChildren
-            ? `<button class="mobile-rail-control" type="button" data-mobile-toggle="${person.id}" aria-label="${isCollapsed || isDepthLimited ? "Expand" : "Collapse"} ${getDisplayName(person)} branch">${isCollapsed || isDepthLimited ? "›" : "⌄"}</button>`
-            : `<span class="mobile-rail-control is-empty"></span>`
-        }
-        <button class="mobile-person-button" type="button" data-profile-id="${person.id}">
+        <button class="mobile-person-button" type="button" data-profile-id="${person.id}" aria-label="Open profile for ${getDisplayName(person)}">
           <span class="mobile-portrait-wrap">${mobilePortraitMarkup(person)}</span>
           <span class="mobile-person-text">
-            <span class="mobile-person-name"><span class="mobile-person-marker ${person.partner ? "is-couple" : ""}"></span>${getDisplayName(person)}</span>
+            <span class="mobile-generation-label">Generation ${level + 1}${person.order ? ` · Child ${person.order}` : ""}</span>
+            <span class="mobile-person-name">${getDisplayName(person)}</span>
             <span class="mobile-person-meta">${getTimeline(person) || `Generation ${person.generation + 1}`}</span>
           </span>
         </button>
         ${
           hasChildren
-            ? `<button class="mobile-branch-button" type="button" data-mobile-toggle="${person.id}" aria-label="${isCollapsed ? "Expand" : "Collapse"} ${getDisplayName(person)} branch">
-                ${isCollapsed || isDepthLimited ? `+${hiddenCount}` : "−"}
+            ? `<button
+                class="mobile-branch-button"
+                type="button"
+                data-mobile-toggle="${person.id}"
+                data-level="${level}"
+                data-depth-limited="${isDepthLimited}"
+                aria-expanded="${isOpen}"
+                aria-label="${isOpen ? "Collapse" : "Show"} ${getDisplayName(person)} descendants"
+              >
+                <span>${isOpen ? children.length : `+${hiddenCount}`}</span>
+                <span class="mobile-branch-chevron" aria-hidden="true">${isOpen ? "⌃" : "⌄"}</span>
               </button>`
             : ""
         }
@@ -164,9 +180,9 @@ function mobilePortraitMarkup(person) {
 
   return `
     <span class="mobile-couple-portrait">
-      <span>${portraitMarkup(person)}</span>
-      <span class="mobile-heart">♥</span>
-      <span>${portraitMarkup(person.partner)}</span>
+      <span class="mobile-couple-person">${portraitMarkup(person)}</span>
+      <span class="mobile-couple-person">${portraitMarkup(person.partner)}</span>
+      <span class="mobile-heart" aria-hidden="true">♥</span>
     </span>
   `;
 }
@@ -434,18 +450,6 @@ function normalizeGenerations(people) {
   }
 }
 
-function applyInitialMobileBranchState() {
-  if (!state.compact) {
-    return;
-  }
-
-  state.people.forEach((person) => {
-    if (person.generation >= 3 && getChildCount(person.id)) {
-      state.collapsedBranches.add(person.id);
-    }
-  });
-}
-
 function getVisiblePeople() {
   const hiddenIds = new Set();
 
@@ -484,7 +488,9 @@ function toggleBranch(personId) {
 
   state.allBranchesExpanded = state.collapsedBranches.size === 0;
   renderTree();
-  centerTree();
+  if (viewport.clientWidth && viewport.clientHeight) {
+    centerTree();
+  }
 }
 
 function expandAllBranches() {
@@ -556,6 +562,14 @@ function bindControls() {
   document.querySelector("[data-action='toggle-branches']").addEventListener("click", toggleAllBranches);
   document.querySelectorAll("[data-depth]").forEach((button) => {
     button.addEventListener("click", () => {
+      if (button.dataset.depth === "all") {
+        state.mobileGenerationDepth = getMobileGenerationCount();
+        state.collapsedBranches.clear();
+        state.allBranchesExpanded = true;
+        renderTree();
+        return;
+      }
+
       state.mobileGenerationDepth = Number(button.dataset.depth);
       renderMobileTree();
     });
@@ -575,9 +589,19 @@ function bindControls() {
 }
 
 function updateGenerationDepthControls() {
+  const generationCount = getMobileGenerationCount();
+
   document.querySelectorAll("[data-depth]").forEach((button) => {
-    button.classList.toggle("is-active", Number(button.dataset.depth) === state.mobileGenerationDepth);
+    const buttonDepth = button.dataset.depth === "all" ? generationCount : Number(button.dataset.depth);
+    const isActive = buttonDepth === state.mobileGenerationDepth;
+
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
   });
+}
+
+function getMobileGenerationCount() {
+  return Math.max(1, ...state.people.map((person) => (person.generation ?? 0) + 1));
 }
 
 function toggleCompactMode() {
@@ -602,7 +626,7 @@ function updateControlLabels() {
   compactButton.textContent = state.compact ? "Full" : "C";
   compactButton.setAttribute("aria-label", state.compact ? "Switch to full-size view" : "Switch to compact view");
 
-  branchesButton.textContent = state.collapsedBranches.size ? "All" : "Less";
+  branchesButton.textContent = state.collapsedBranches.size ? "Expand" : "Simplify";
   branchesButton.setAttribute(
     "aria-label",
     state.collapsedBranches.size ? "Expand all branches" : "Collapse deeper branches"
@@ -797,6 +821,10 @@ function centerTree() {
   const canvasHeight = canvas.offsetHeight;
   const viewportWidth = viewport.clientWidth;
   const viewportHeight = viewport.clientHeight;
+
+  if (!viewportWidth || !viewportHeight) {
+    return;
+  }
   const padding = Math.min(80, Math.max(28, viewportWidth * 0.08));
   const widthScale = (viewportWidth - padding * 2) / canvasWidth;
   const heightScale = (viewportHeight - padding * 2) / canvasHeight;
